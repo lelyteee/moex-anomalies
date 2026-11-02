@@ -17,7 +17,3 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 - Are there sharp moves or squeezes around key rate decisions?
 - Are low-liquidity stocks more exposed to manipulation?
 - How does the price behave after an anomaly, and over what horizon?
-
----
-
-© 2026 Igor Artiukhov. All rights reserved.
