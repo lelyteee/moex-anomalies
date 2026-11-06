@@ -35,7 +35,7 @@ with Client(token) as client:
         df = data[k]
         rb = changes["rate_before"][k]
         ra = changes["rate_after"][k]
-        out.write(f"{day} - {rb} -> {ra} ({ra - rb})\n")
+        out.write(f"{day} - {rb} -> {ra} ({ra - rb:+})\n")
         if len(df) == 0:
             out.write("No data available\n\n")
             continue
