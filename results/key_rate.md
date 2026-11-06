@@ -48,9 +48,15 @@ The new regime starts with 15 Sep 2023. The hiking cycle itself started a month 
 
 Not verified yet. Possible causes: release a few seconds early, timestamp shift in the data, another event, trading before the release.
 
-## Limitations
+## Discussion
 
-- 45 events: small sample
-- No analyst consensus yet, so surprise is not measured
-- No comparison with the same minute on ordinary days
-- Index only: no volume
+Comments from an economist (informal):
+
+- **Why reactions grew.** After 2022 companies lost access to foreign capital and depend on domestic credit and the state. The key rate became the main channel, so the market is more sensitive to it.
+- **Expectations.** Prices already include the expected decision. When the rate does not change, credit conditions do not change either, so a strong move on a hold day can only come from expectations.
+- **10:29 moves** may partly be expectations being realized just before the release.
+
+Open points:
+
+- The timing does not fully fit the first argument: reactions stayed small through the second half of 2022 and only grew from mid-2023, together with the hiking cycle. Dependence on the rate explains *why* the market reacts, but not *why from 2023*.
+- Expectations are priced over days, not in one minute. A 1% move inside the minute before the release still needs a trigger.
