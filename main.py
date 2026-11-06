@@ -17,8 +17,8 @@ def get_price(x):
 
 with Client(token) as client:
     uid = "4821c9aa-36e8-4743-b37c-861e58581b25"
-    start = datetime(2024, 10, 25, 6, 0, tzinfo=timezone.utc)
-    end = datetime(2024, 10, 25, 21, 0, tzinfo=timezone.utc)
+    start = datetime(2024, 10, 25, 9, 00, tzinfo=timezone.utc)
+    end = datetime(2024, 10, 25, 11, 45, tzinfo=timezone.utc)
     candles = client.market_data.get_candles(from_=start, to=end, interval=CandleInterval.CANDLE_INTERVAL_1_MIN, instrument_id=uid)
     rows = []
     for candle in candles.candles:
@@ -26,6 +26,5 @@ with Client(token) as client:
                "close": get_price(candle.close), "volume": candle.volume}
         rows.append(row)
     df = pandas.DataFrame(rows)
-    print(df.head())
-    print(df.tail())
+    print(df)
     df.to_csv("data/imoex_2024-10-25.csv", index=False)
