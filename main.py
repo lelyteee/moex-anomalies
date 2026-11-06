@@ -29,33 +29,45 @@ with Client(token) as client:
         for i in candles.candles:
             data[-1].append({"time": i.time, "open": get_price(i.open), "close": get_price(i.close), "low": get_price(i.low), "high": get_price(i.high)})
         data[-1] = pandas.DataFrame(data[-1])
-    out = open("data/results.txt", "w")
+    out = open("results/results_2.txt", "w")
+    raw = open("results/around_1030.txt", "w")
     for k in range(len(data)):
         day = changes["date"][k]
         df = data[k]
         rb = changes["rate_before"][k]
         ra = changes["rate_after"][k]
         out.write(f"{day} - {rb} -> {ra} ({ra - rb:+})\n")
+        raw.write(f"{day}\n")
         if len(df) == 0:
             out.write("No data available\n\n")
+            raw.write("No data available\n\n")
             continue
         opens = {}
         closes = {}
         for i in range(len(df)):
             t = df["time"][i]
-            opens[t.hour * 60 + t.minute] = df["open"][i]
-            closes[t.hour * 60 + t.minute] = df["close"][i]
-        news = 10 * 60 + 30
+            m = t.hour * 60 + t.minute
+            opens[m] = df["open"][i]
+            closes[m] = df["close"][i]
+            if 10 * 60 + 25 <= m <= 10 * 60 + 35:
+                raw.write(f"{t.hour:02}:{t.minute:02}  o {df['open'][i]:.2f}  h {df['high'][i]:.2f}  l {df['low'][i]:.2f}  c {df['close'][i]:.2f}\n")
+        raw.write("\n")
+        base_time = 10 * 60 + 29
+        if base_time not in closes:
+            out.write("No 10:29 candle\n\n")
+            continue
+        base = closes[base_time]
+        pre = (base - opens[base_time]) / opens[base_time] * 100
+        out.write(f"10:29 : {opens[base_time]:.2f} -> {base:.2f} : {pre:+.2f}%\n")
         for x in nbh:
-            a = news - x
-            b = news + x - 1
-            if a in opens and b in closes:
-                change = (closes[b] - opens[a]) / opens[a] * 100
-                out.write(f"+-{x} : {opens[a]:.5f} -> {closes[b]:.5f} : {change:+.5f}%\n")
+            b = base_time + x
+            if b in closes:
+                change = (closes[b] - base) / base * 100
+                out.write(f"+{x} : {base:.2f} -> {closes[b]:.2f} : {change:+.2f}%\n")
             else:
-                out.write(f"+-{x} : no candles\n")
-        day_open = df["open"][0]
+                out.write(f"+{x} : no candles\n")
         day_close = df["close"][len(df) - 1]
-        change = (day_close - day_open) / day_open * 100
-        out.write(f"day : {day_open:.5f} -> {day_close:.5f} : {change:+.5f}%\n\n")
+        change = (day_close - base) / base * 100
+        out.write(f"to close : {base:.2f} -> {day_close:.2f} : {change:+.2f}%\n\n")
     out.close()
+    raw.close()
