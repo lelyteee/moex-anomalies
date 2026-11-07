@@ -50,7 +50,7 @@ with Client(token) as client:
             opens[m] = df["open"][i]
             closes[m] = df["close"][i]
             if 10 * 60 + 25 <= m <= 10 * 60 + 35:
-                raw.write(f"{t.hour:02}:{t.minute:02}  o {df['open'][i]:.2f}  h {df['high'][i]:.2f}  l {df['low'][i]:.2f}  c {df['close'][i]:.2f}\n")
+                raw.write(f"{t.hour:02}:{t.minute:02}  o {df['open'][i]:.3f}  h {df['high'][i]:.3f}  l {df['low'][i]:.3f}  c {df['close'][i]:.3f}\n")
         raw.write("\n")
         base_time = 10 * 60 + 29
         if base_time not in closes:
@@ -58,16 +58,46 @@ with Client(token) as client:
             continue
         base = closes[base_time]
         pre = (base - opens[base_time]) / opens[base_time] * 100
-        out.write(f"10:29 : {opens[base_time]:.2f} -> {base:.2f} : {pre:+.2f}%\n")
+        out.write(f"10:29 : {opens[base_time]:.3f} -> {base:.3f} : {pre:+.3f}%\n")
         for x in nbh:
             b = base_time + x
             if b in closes:
                 change = (closes[b] - base) / base * 100
-                out.write(f"+{x} : {base:.2f} -> {closes[b]:.2f} : {change:+.2f}%\n")
+                out.write(f"+{x} : {base:.3f} -> {closes[b]:.3f} : {change:+.3f}%\n")
             else:
                 out.write(f"+{x} : no candles\n")
         day_close = df["close"][len(df) - 1]
         change = (day_close - base) / base * 100
-        out.write(f"to close : {base:.2f} -> {day_close:.2f} : {change:+.2f}%\n\n")
+        out.write(f"to close : {base:.3f} -> {day_close:.3f} : {change:+.3f}%\n\n")
     out.close()
     raw.close()
+
+    # 5-second candles, 10:00-11:00 UTC. T-Invest keeps them only for the last 30 days
+    # d     : change from the previous candle close
+    # range : (high - low) / open inside the candle
+    sec = open("results/seconds_1030.txt", "w")
+    today = datetime.now(timezone.utc)
+    for k in range(len(changes)):
+        day = changes["date"][k]
+        date = datetime.strptime(day, "%Y-%m-%d")
+        start = date.replace(hour=10, minute=0, tzinfo=timezone.utc)
+        end = date.replace(hour=11, minute=0, tzinfo=timezone.utc)
+        if (today - start).days >= 30:
+            continue
+        candles = client.market_data.get_candles(from_=start, to=end, interval=CandleInterval.CANDLE_INTERVAL_5_SEC, instrument_id=uid, candle_source_type=CandleSource.CANDLE_SOURCE_EXCHANGE)
+        sec.write(f"{day} ({len(candles.candles)} candles)\n")
+        prev = -1
+        for c in candles.candles:
+            t = c.time
+            o = get_price(c.open)
+            h = get_price(c.high)
+            l = get_price(c.low)
+            cl = get_price(c.close)
+            if prev == -1:
+                prev = o
+            d = (cl - prev) / prev * 100
+            rng = (h - l) / o * 100
+            sec.write(f"{t.hour:02}:{t.minute:02}:{t.second:02}  o {o:.2f}  h {h:.2f}  l {l:.2f}  c {cl:.2f}  d {d:+.3f}%  range {rng:.3f}%\n")
+            prev = cl
+        sec.write("\n")
+    sec.close()
