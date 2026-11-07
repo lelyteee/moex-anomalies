@@ -26,7 +26,7 @@ Results: [`results/key_rate.md`](results/key_rate.md)
 ## Structure
 
 ```
-main.py                       download candles, compute reactions
+scripts/key_rate.py           download candles, compute reactions
 data/cb_kir_decisions.csv     decision dates, rate before / after
 results/key_rate.md           findings
 results/*.txt                 raw output
@@ -37,6 +37,6 @@ results/*.txt                 raw output
 ```bash
 pip install pandas python-dotenv t-tech-investments
 echo "T_INVEST_TOKEN=..." > .env   # read-only token
-python main.py
+python scripts/key_rate.py
 ```
 
