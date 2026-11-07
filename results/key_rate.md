@@ -7,6 +7,7 @@ How IMOEX moves when the Bank of Russia announces the key rate.
 - **Is there a jump?** Yes. Since mid-2023 the index moves 0.5–2% within the first minute after the release, and the move does not reverse within an hour.
 - **Where?** The decision alone does not tell. A hike can push the index up or down. Examples suggest the direction follows the surprise relative to expectations. Not tested yet: analyst consensus is still missing.
 - **When?** Since mid-2023 the reaction is about 15× larger than in 2021 – mid-2023.
+- **Why from 2023?** Likely two conditions at once: the market became sensitive to the rate (capital locked inside the country, retail-driven trading, credit dependence), and the rate became high and uncertain (hiking cycle from Aug 2023). A high rate alone was not enough: in spring 2022 the rate was 11–17% and the reaction stayed near zero. Hypothesis, not proven.
 - **Anything suspicious?** In 3 of 45 days the index moved 0.4–1.2% in the minute *before* the release. Under check.
 
 ## Setup
@@ -66,6 +67,20 @@ Comments from an economist (informal):
 - **Why reactions grew.** After 2022 companies lost access to foreign capital and depend on domestic credit and the state. The key rate became the main channel, so the market is more sensitive to it.
 - **Expectations.** Prices already include the expected decision. When the rate does not change, credit conditions do not change either, so a strong move on a hold day can only come from expectations.
 - **10:29 moves** may partly be expectations being realized just before the release.
+
+Another view (informal discussion):
+
+- After 2022 foreign companies sold their Russian businesses to local owners, often on credit. Capital stayed inside the country, foreign investment stopped. About a year into the war the market accepted that this is long-term, and sentiment changed. Together this made the market more dependent on domestic credit and on the key rate.
+
+Reaction vs rate level (mean \|+1 min\|):
+
+| Rate before decision | Days | mean \|+1 min\| |
+|---|---|---|
+| below 10% | 17 | 0.05% |
+| 10–17% | 17 | 0.61% |
+| 17% and above | 11 | 0.85% |
+
+Rate level and time overlap: the rate was below 10% only before Aug 2023. One exception helps: in spring 2022 the rate was high (17% on 29 Apr, 11% on 10 Jun), yet the reaction was tiny (0.07% and 0.04%). So a high rate alone is not enough. The switch in Sep 2023 needs both a high, uncertain rate and a market that became sensitive to it.
 
 Open points:
 
