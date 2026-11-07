@@ -72,9 +72,6 @@ with Client(token) as client:
     out.close()
     raw.close()
 
-    # 5-second candles, 10:00-11:00 UTC. T-Invest keeps them only for the last 30 days
-    # d     : change from the previous candle close
-    # range : (high - low) / open inside the candle
     sec = open("results/seconds_1030.txt", "w")
     today = datetime.now(timezone.utc)
     for k in range(len(changes)):
