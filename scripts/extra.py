@@ -11,12 +11,10 @@ token = os.environ["T_INVEST_TOKEN"]
 def get_price(x):
     return x.units + x.nano * 1e-9
 
-# extraordinary decisions: date, release time UTC, rate before, rate after
-# 28.02.2022 (9.5 -> 20) is skipped: stock market was closed
 extra = [
-    ["2022-04-08", 8, 40, 20.0, 17.0],   # cbr file 08042022_114000key -> 11:40 MSK
-    ["2022-05-26", 7, 30, 14.0, 11.0],   # interfax 10:33 MSK, release ~10:30 MSK (check on candles)
-    ["2023-08-15", 7, 30, 8.5, 12.0],    # cbr file 15082023_103000Key -> 10:30 MSK
+    ["2022-04-08", 8, 40, 20.0, 17.0],
+    ["2022-05-26", 7, 30, 14.0, 11.0],
+    ["2023-08-15", 7, 30, 8.5, 12.0],
 ]
 
 with Client(token) as client:

@@ -117,3 +117,14 @@ Open points:
 
 - The timing does not fully fit the first argument: reactions stayed small through the second half of 2022 and only grew from mid-2023, together with the hiking cycle. Dependence on the rate explains *why* the market reacts, but not *why from 2023*.
 - Expectations are priced over days, not in one minute. A 1% move inside the minute before the release still needs a trigger.
+
+## Notes and ideas
+
+Personal takeaways, not verified.
+
+- **News first.** Any unusual move has to be checked against news and company disclosures before calling it an anomaly. A move right after a news item is a reaction, not an anomaly.
+- **Look at single stocks, not the index.** Pump-and-dump schemes and insider trading are said to be common on the Russian market, mostly in low-liquidity stocks where little money moves the price. The index averages this away.
+- **Spike and reversal.** A sharp move followed by a quick move back is the hard case: it can be a stop-hunt, a manipulation or a liquidity shock. In this sample: 6 Jun 2025, 11 Sep 2026 (before the release) and 15 Aug 2023 (after). A simple first detector: a jump above X% within a minute, then more than half of it given back within N minutes.
+- **Insider footprint.** Someone with inside information may take a large, often leveraged position in a stock nobody usually trades. Open data does not show who traded or with what leverage, only the footprint: volume many times above the stock's norm, then a disclosure, then a price move in the same direction. False positives matter: count how often a volume spike is followed by news at all.
+- **Labelled examples.** The Bank of Russia publishes cases of detected market manipulation and insider trading. If they include tickers and dates, they could serve as known examples to test a detector on.
+- **Related work.** Bernile, Hu, Tang (2016) found informed trading in S&P 500 futures in the minutes before Fed announcements — the closest analogue to the moves before 10:30 here.
