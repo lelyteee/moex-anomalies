@@ -12,7 +12,7 @@ How IMOEX moves when the Bank of Russia announces the key rate.
 
 ## Setup
 
-Raw output: [`results_2.txt`](results_2.txt) (forward windows), [`results_1.txt`](results_1.txt) (±x windows, old), [`around_1030.txt`](around_1030.txt) (candles 10:25–10:35).
+Raw output: [`results_2.txt`](raw/results_2.txt) (forward windows), [`results_1.txt`](raw/results_1.txt) (±x windows, old), [`around_1030.txt`](raw/around_1030.txt) (candles 10:25–10:35).
 
 ## Findings
 
@@ -60,9 +60,9 @@ Not verified yet. Possible causes: release a few seconds early, timestamp shift 
 
 The release came out exactly at 10:30:00 and T-Invest timestamps are accurate for this day. The minute before was calm: the largest 5-second move was +0.13% at 10:29:25, then back. The three suspicious days are older than 30 days and cannot be checked this way.
 
-Futures on the same day ([`imoexf_seconds.txt`](imoexf_seconds.txt)): trading jumps exactly at 10:29:00, from ~50 to ~1,000 contracts per 5 seconds, and stays high for the whole minute (about 16,000 contracts in 10:29). The largest burst, 5,126 contracts at 10:29:25, lifted the price by 0.19% and it came back within 10 seconds. Net move over the minute: −0.04%. The release itself brought 50,449 contracts in the first 5 seconds. So heavy volume at 10:29 alone looks like normal two-sided positioning before the release, not a sign of a leak. A price move before the release is what matters.
+Futures on the same day ([`imoexf_seconds.txt`](raw/imoexf_seconds.txt)): trading jumps exactly at 10:29:00, from ~50 to ~1,000 contracts per 5 seconds, and stays high for the whole minute (about 16,000 contracts in 10:29). The largest burst, 5,126 contracts at 10:29:25, lifted the price by 0.19% and it came back within 10 seconds. Net move over the minute: −0.04%. The release itself brought 50,449 contracts in the first 5 seconds. So heavy volume at 10:29 alone looks like normal two-sided positioning before the release, not a sign of a leak. A price move before the release is what matters.
 
-**7. Futures confirm the pre-release moves.** IMOEXF. Raw: [`imoexf.txt`](imoexf.txt).
+**7. Futures confirm the pre-release moves.** IMOEXF. Raw: [`imoexf.txt`](raw/imoexf.txt).
 
 - In the three suspicious days the futures moved the same way as the index at 10:29, so these are real trades, not a data error.
 - Volume is shown relative to the mean of 10:15–10:24 on the same day.

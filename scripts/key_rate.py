@@ -29,8 +29,8 @@ with Client(token) as client:
         for i in candles.candles:
             data[-1].append({"time": i.time, "open": get_price(i.open), "close": get_price(i.close), "low": get_price(i.low), "high": get_price(i.high)})
         data[-1] = pandas.DataFrame(data[-1])
-    out = open("results/results_2.txt", "w")
-    raw = open("results/around_1030.txt", "w")
+    out = open("results/key_rate/raw/results_2.txt", "w")
+    raw = open("results/key_rate/raw/around_1030.txt", "w")
     for k in range(len(data)):
         day = changes["date"][k]
         df = data[k]
@@ -72,7 +72,7 @@ with Client(token) as client:
     out.close()
     raw.close()
 
-    sec = open("results/seconds_1030.txt", "w")
+    sec = open("results/key_rate/raw/seconds_1030.txt", "w")
     today = datetime.now(timezone.utc)
     for k in range(len(changes)):
         day = changes["date"][k]

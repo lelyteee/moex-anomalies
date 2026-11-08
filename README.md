@@ -21,15 +21,17 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 ## Current work
 
 **Key rate decisions** — how IMOEX reacts to Bank of Russia announcements, minute by minute.
-Results: [`results/key_rate.md`](results/key_rate.md)
+Results: [`results/key_rate/`](results/key_rate/)
 
 ## Structure
 
 ```
-scripts/key_rate.py           download candles, compute reactions
+scripts/key_rate.py           index: download candles, compute reactions
+scripts/imoexf.py             IMOEXF futures: price, volume, 5-second candles
+scripts/extra.py              extraordinary decisions
 data/cb_kir_decisions.csv     decision dates, rate before / after
-results/key_rate.md           findings
-results/*.txt                 raw output
+results/key_rate/README.md    findings
+results/key_rate/raw/         raw output (txt tables)
 ```
 
 ## Run
