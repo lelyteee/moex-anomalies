@@ -4,11 +4,11 @@ How IMOEX moves when the Bank of Russia announces the key rate.
 
 ## Summary
 
-- **Is there a jump?** Yes. Since mid-2023 the index moves 0.5–2% within the first minute after the release, and the move does not reverse within an hour.
+- **Is there a jump?** Yes. Since mid-2023 the index moves 0.5–2% within the first minute after the release, and the move usually does not reverse within an hour (one exception: 15 Aug 2023).
 - **Where?** The decision alone does not tell. A hike can push the index up or down. Examples suggest the direction follows the surprise relative to expectations. Not tested yet: analyst consensus is still missing.
 - **When?** Since mid-2023 the reaction is about 15× larger than in 2021 – mid-2023.
-- **Why from 2023?** Likely two conditions at once: the market became sensitive to the rate (capital locked inside the country, retail-driven trading, credit dependence), and the rate became high and uncertain (hiking cycle from Aug 2023). A high rate alone was not enough: in spring 2022 the rate was 11–17% and the reaction stayed near zero. Hypothesis, not proven.
-- **Anything suspicious?** In 3 of 45 days the index moved 0.4–1.2% in the minute *before* the release. Under check.
+- **Why from 2023?** Likely two conditions at once: the market became sensitive to the rate (capital locked inside the country, retail-driven trading, credit dependence), and the rate became high and uncertain (hiking cycle from Aug 2023). A high rate alone was not enough: in spring 2022 the rate was 11–20%, the Bank cut it by 3 p.p. twice at extraordinary meetings, and the reaction stayed near zero. The first strong reaction is the extraordinary hike of 15 Aug 2023. Hypothesis, not proven.
+- **Anything suspicious?** In 4 days the index moved 0.4–1.2% in the minutes *before* the release, confirmed on futures. In two of them the move went the same way as the later reaction. Under check.
 
 ## Setup
 
@@ -31,9 +31,9 @@ Raw output: [`results_2.txt`](results_2.txt) (forward windows), [`results_1.txt`
 | Mar 2021 – Jun 2023 | 18 | 0.05% | 0.13% | 0.53% |
 | Jul 2023 – Oct 2026 | 27 | 0.73% | 0.83% | 1.59% |
 
-The new regime starts with 15 Sep 2023. The hiking cycle itself started a month earlier, with the extraordinary decision of 15 Aug 2023 (8.5% → 12%).
+The new regime starts with the extraordinary decision of 15 Aug 2023 (8.5% → 12%), which also opened the hiking cycle. See finding 8.
 
-**3. The move happens in the first minute and holds.** In all 18 days with \|+5 min\| ≥ 0.5%, the sign at +60 min is the same.
+**3. The move happens in the first minute and holds.** In all 18 scheduled days with \|+5 min\| ≥ 0.5%, the sign at +60 min is the same. The one clear reversal is the extraordinary decision of 15 Aug 2023 (finding 8).
 
 **4. Expectations matter more than the decision.**
 
@@ -79,6 +79,18 @@ Futures on the same day ([`imoexf_seconds.txt`](imoexf_seconds.txt)): trading ju
 - Opposite-direction cases look like bets on the expected decision rather than leaks. Same-direction cases are worth checking against news.
 - IMOEXF volume grew from ~10 contracts per minute in Dec 2023 to 600–3,500 in 2025–2026. Volume ratios before mid-2024 are not reliable. This growth reflects the new instrument getting popular, not the whole market.
 
+**8. Extraordinary decisions.** Release times from the Bank of Russia file names and news timestamps. 28 Feb 2022 (9.5 → 20) is skipped: the stock market was closed.
+
+| Date | Decision | Release (UTC) | Release minute | Next 45 min |
+|---|---|---|---|---|
+| 8 Apr 2022 | 20 → 17 | 08:40 | −0.03% | slow drift, −0.4% |
+| 26 May 2022 | 14 → 11 | 07:30 (approx.) | −0.06% | slow drift, +0.5% |
+| 15 Aug 2023 | 8.5 → 12 | 07:30 | **−0.82%** | reversal: +1.2% above the pre-release level by 07:58 |
+
+- Even 3 p.p. cuts in 2022 did not move the market. Before mid-2023 extraordinary meetings did not change the picture.
+- 15 Aug 2023 is the first strong reaction in the whole sample and the start of the new regime.
+- It is also the only clear reversal: −0.8% in the first minute, then up. Two of these meetings (26 May 2022 and 15 Aug 2023) were announced a day before, so the direction was expected and only the size was a surprise.
+
 ## Discussion
 
 Comments from an economist (informal):
@@ -99,7 +111,7 @@ Reaction vs rate level (mean \|+1 min\|):
 | 10–17% | 17 | 0.61% |
 | 17% and above | 11 | 0.85% |
 
-Rate level and time overlap: the rate was below 10% only before Aug 2023. One exception helps: in spring 2022 the rate was high (17% on 29 Apr, 11% on 10 Jun), yet the reaction was tiny (0.07% and 0.04%). So a high rate alone is not enough. The switch in Sep 2023 needs both a high, uncertain rate and a market that became sensitive to it.
+Rate level and time overlap: the rate was below 10% only before Aug 2023. One exception helps: in spring 2022 the rate was high (17% on 29 Apr, 11% on 10 Jun), yet the reaction was tiny (0.07% and 0.04%). The extraordinary cuts of 8 Apr 2022 (20 → 17) and 26 May 2022 (14 → 11) also passed almost unnoticed. So a high rate alone is not enough. The switch in Aug 2023 needs both a high, uncertain rate and a market that became sensitive to it.
 
 Open points:
 
