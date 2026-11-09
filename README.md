@@ -23,6 +23,9 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 **Key rate decisions** — how IMOEX reacts to Bank of Russia announcements, minute by minute.
 Results: [`results/key_rate/`](results/key_rate/)
 
+**Weekend sessions** — does weekend trading predict Monday.
+Results: [`results/weekend/`](results/weekend/)
+
 ## Structure
 
 ```
