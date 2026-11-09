@@ -5,9 +5,9 @@ How IMOEX moves when the Bank of Russia announces the key rate.
 ## Summary
 
 - **Is there a jump?** Yes. Since mid-2023 the index moves 0.5–2% within the first minute after the release, and the move usually does not reverse within an hour (one exception: 15 Aug 2023).
-- **Where?** The decision alone does not tell. A hike can push the index up or down. Examples suggest the direction follows the surprise relative to expectations. Not tested yet: analyst consensus is still missing.
+- **Where?** The decision alone does not tell. A hike can push the index up or down. The direction follows the surprise: when government bonds (RGBI) rise after the release, stocks rise, when bonds fall, stocks fall. corr +0.86 at +60 min over 44 decisions. See [pre_decision](../pre_decision/).
 - **When?** Since mid-2023 the reaction is about 15× larger than in 2021 – mid-2023.
-- **Why from 2023?** Likely two conditions at once: the market became sensitive to the rate (capital locked inside the country, retail-driven trading, credit dependence), and the rate became high and uncertain (hiking cycle from Aug 2023). A high rate alone was not enough: in spring 2022 the rate was 11–20%, the Bank cut it by 3 p.p. twice at extraordinary meetings, and the reaction stayed near zero. The first strong reaction is the extraordinary hike of 15 Aug 2023. Hypothesis, not proven.
+- **Why from 2023?** Two parts, measured on bonds: surprises became ~4× larger and stocks ~3× more sensitive to the same surprise. In spring 2022 the 3 p.p. cuts were expected: bonds barely moved, so stocks did not either. The first strong reaction is the extraordinary hike of 15 Aug 2023.
 - **Anything suspicious?** In 4 days the index moved 0.4–1.2% in the minutes *before* the release, confirmed on futures. In two of them the move went the same way as the later reaction. Under check.
 
 ## Setup
@@ -87,7 +87,7 @@ Futures on the same day ([`imoexf_seconds.txt`](raw/imoexf_seconds.txt)): tradin
 | 26 May 2022 | 14 → 11 | 07:30 (approx.) | −0.06% | slow drift, +0.5% |
 | 15 Aug 2023 | 8.5 → 12 | 07:30 | **−0.82%** | reversal: +1.2% above the pre-release level by 07:58 |
 
-- Even 3 p.p. cuts in 2022 did not move the market. Before mid-2023 extraordinary meetings did not change the picture.
+- Even 3 p.p. cuts in 2022 did not move the market. Bonds barely moved either: the cuts were expected.
 - 15 Aug 2023 is the first strong reaction in the whole sample and the start of the new regime.
 - It is also the only clear reversal: −0.8% in the first minute, then up. Two of these meetings (26 May 2022 and 15 Aug 2023) were announced a day before, so the direction was expected and only the size was a surprise.
 
@@ -111,7 +111,7 @@ Reaction vs rate level (mean \|+1 min\|):
 | 10–17% | 17 | 0.61% |
 | 17% and above | 11 | 0.85% |
 
-Rate level and time overlap: the rate was below 10% only before Aug 2023. One exception helps: in spring 2022 the rate was high (17% on 29 Apr, 11% on 10 Jun), yet the reaction was tiny (0.07% and 0.04%). The extraordinary cuts of 8 Apr 2022 (20 → 17) and 26 May 2022 (14 → 11) also passed almost unnoticed. So a high rate alone is not enough. The switch in Aug 2023 needs both a high, uncertain rate and a market that became sensitive to it.
+Rate level and time overlap: the rate was below 10% only before Aug 2023. In spring 2022 the rate was high (17% on 29 Apr, 11% on 10 Jun), yet the reaction was tiny (0.07% and 0.04%). Bonds show why: RGBI moved +0.09% and −0.05%, the decisions were expected. Update from [pre_decision](../pre_decision/): the 2023 switch is ~4× larger surprises times ~3× higher sensitivity.
 
 Open points:
 

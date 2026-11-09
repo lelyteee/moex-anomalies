@@ -23,6 +23,9 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 **Key rate decisions** — how IMOEX reacts to Bank of Russia announcements, minute by minute.
 Results: [`results/key_rate/`](results/key_rate/)
 
+**Before and around the decision** — week before, and government bonds as a surprise measure.
+Results: [`results/pre_decision/`](results/pre_decision/)
+
 **Weekend sessions** — does weekend trading predict Monday.
 Results: [`results/weekend/`](results/weekend/)
 
@@ -32,9 +35,21 @@ Results: [`results/weekend/`](results/weekend/)
 scripts/key_rate.py           index: download candles, compute reactions
 scripts/imoexf.py             IMOEXF futures: price, volume, 5-second candles
 scripts/extra.py              extraordinary decisions
+scripts/pre_decision.py       daily IMOEX, bond index and bank lookups
+scripts/pre_week.py           week before each decision
+scripts/bonds.py              bond index (RGBI) vs IMOEX around the release
+scripts/drift.py              IMOEX after the first minutes vs bond surprise
+scripts/banks.py              banks and Lukoil around the release
+scripts/weekend.py            weekend sessions, first pass
+scripts/weekend_gap.py        weekend vs Monday, split by session
+scripts/morning.py            morning session by weekday, IMOEXF vs IMOEX2
 data/cb_kir_decisions.csv     decision dates, rate before / after
+data/imoex_daily.csv          IMOEX daily candles since 2021
+data/banks.csv                banks and Lukoil: tickers and uids
 results/key_rate/README.md    findings
 results/key_rate/raw/         raw output (txt tables)
+results/pre_decision/         week before, bonds, banks
+results/weekend/              weekend sessions
 ```
 
 ## Run
