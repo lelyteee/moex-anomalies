@@ -8,6 +8,7 @@ What happens in the week before a Bank of Russia decision, and what bonds say ab
 | [`bonds.txt`](raw/bonds.txt) | RGBI (government bond index) vs IMOEX after 10:30 UTC, 44 decisions from Apr 2021 |
 | [`drift.txt`](raw/drift.txt) | IMOEX after 10:34 in the direction of the bond surprise, 27 decisions from Jul 2023 |
 | [`banks.txt`](raw/banks.txt) | SBER, VTBR, T, BSPB, LKOH (control) vs IMOEX and RGBI, 46 decisions |
+| [`small_banks.txt`](raw/small_banks.txt) | smaller and illiquid banks, 46 decisions |
 
 RGBI up = yields down = the decision was softer than expected. RGBI minute data from Apr 2021; no RGBI daily data in T-Invest before Sep 2023, so the bond week-before move covers 26 decisions.
 
@@ -67,3 +68,16 @@ On 11 Sep 2026 Lukoil, the least rate-sensitive stock, moved the most. Banks do 
 - a large position in index futures before the release, with arbitrage pulling all index stocks;
 - a leak (weakest: wrong direction in 2 of 3 days, banks not ahead).
 
+**8. Small and illiquid banks.** From Jul 2023, +60 min.
+
+| Stock | Minutes with trades (of 75) | per 1% IMOEX | corr with RGBI |
+|---|---|---|---|
+| SVCB | 75 | 1.40 | 0.89 |
+| MBNK | 68 | 0.88 | 0.82 |
+| CBOM | 65 | 1.17 | 0.83 |
+| ZAYM | 50 | 0.64 | 0.84 |
+| ROSB | 41 | 0.56 | 0.43 |
+| AVAN | 25 | 0.44 | 0.74 |
+| KUZB | 22 | 1.23 | 0.48 |
+
+The less a stock trades, the weaker and noisier its reaction within the hour: prices are stale. Before the release only 4 big moves (≥0.5%) in all small banks: two on 11 Sep 2026 (the market-wide day), two in illiquid AVAN and KUZB on 9 Jun 2023. Only one went the same way as the reaction. Nothing suspicious here.
