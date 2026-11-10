@@ -9,6 +9,7 @@ What happens in the week before a Bank of Russia decision, and what bonds say ab
 | [`drift.txt`](raw/drift.txt) | IMOEX after 10:34 in the direction of the bond surprise, 27 decisions from Jul 2023 |
 | [`banks.txt`](raw/banks.txt) | SBER, VTBR, T, BSPB, LKOH (control) vs IMOEX and RGBI, 46 decisions |
 | [`small_banks.txt`](raw/small_banks.txt) | smaller and illiquid banks, 46 decisions |
+| [`press.txt`](raw/press.txt) | IMOEX around the press conference (12:00 UTC) vs the same time a week earlier, 44 decisions |
 
 RGBI up = yields down = the decision was softer than expected. RGBI minute data from Apr 2021; no RGBI daily data in T-Invest before Sep 2023, so the bond week-before move covers 26 decisions.
 
@@ -81,3 +82,30 @@ On 11 Sep 2026 Lukoil, the least rate-sensitive stock, moved the most. Banks do 
 | KUZB | 22 | 1.23 | 0.48 |
 
 The less a stock trades, the weaker and noisier its reaction within the hour: prices are stale. Before the release only 4 big moves (≥0.5%) in all small banks: two on 11 Sep 2026 (the market-wide day), two in illiquid AVAN and KUZB on 9 Jun 2023. Only one went the same way as the reaction. Nothing suspicious here.
+
+**9. The press conference is a second event.** 12:00 UTC (15:00 MSK), 90 minutes after the release.
+
+| From Jul 2023, mean \|IMOEX move\| | Decision day | Same time a week earlier |
+|---|---|---|
+| 11:29 → 11:59 (before) | 0.21% | 0.11% |
+| 11:59 → 12:30 | 0.33% | 0.10% |
+| 11:59 → 13:00 | 0.44% | 0.19% |
+| 13:00 → close | 0.51% | 0.43% |
+
+Before Jul 2023 there was no difference (0.17% vs 0.17% for 11:59 → 13:00).
+
+- The press-conference hour drives most of what happens after the first hour: corr +0.90 with 11:29 → close, same sign 25/27. Part of this is mechanical, since that hour is inside the longer window.
+- Bonds and stocks move together during the press conference, but less tightly than at the release: corr +0.48 (noise ±0.38). Words about the future matter, but the bond index catches them worse.
+- The first hour does not tell where the press conference goes: corr +0.26.
+- Examples: 6 Jun 2025 +0.51% in the first hour, then −1.11% during the press conference; 13 Sep 2024 −1.45%, then +1.16%; 24 Jul 2026 +1.46%; 23 Oct 2026 +0.74%.
+
+**10. Key meetings vs regular ones.** Key meetings come with a new medium-term forecast, including the key rate path (Feb, Apr, Jul, Oct, plus 15 Sep 2023; from the Bank of Russia calendar). From Jul 2023:
+
+| | Key (15) | Regular (12) |
+|---|---|---|
+| mean \|IMOEX +60 min\| | 0.65% | 1.15% |
+| mean \|RGBI +60 min\| | 0.28% | 0.39% |
+| corr RGBI vs IMOEX, +60 min | +0.63 | +0.96 |
+| mean \|IMOEX not explained by RGBI\| | 0.43% | 0.32% |
+
+At regular meetings bonds explain the stock reaction almost fully (+0.82 without 20 Dec 2024). At key meetings the link is weaker: part of the surprise is in the forecast path, which the bond index catches worse. 15 Sep 2023, the day stocks moved most against bonds (+0.78% vs −0.40%), was a key meeting.
