@@ -6,3 +6,5 @@ data/raw/
 plan.md
 archive/
 data/daily/
+data/seconds/
+.DS_Store

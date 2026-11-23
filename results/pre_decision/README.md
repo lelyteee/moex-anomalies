@@ -108,3 +108,15 @@ Before Jul 2023 there was no difference. The press conference explains most of t
 | move not explained by bonds | 0.43% | 0.32% |
 
 On regular meetings bonds explain the stock reaction almost completely. On key meetings much worse: part of the surprise is in the forecast, and the bond index catches it badly. 15 Sep 2023, when stocks went most against bonds (+0.78% while bonds −0.40%), was a key meeting.
+
+**11. News on the strange days.** Days where stocks moved far from what bonds explain, checked against the news:
+
+| Date | Decision | What the news says | Fits |
+|---|---|---|---|
+| 24 Oct 2025 (key) | cut 17 → 16.5% | the Bank raised its average rate forecast for 2026 to 13–15% (was 12–13%); analysts called it more negative than the cut itself. Two days earlier the US sanctioned Rosneft and Lukoil | first the cut (+0.96%), then the forecast (−1.42% in an hour). The surprise was in the forecast, as in finding 10 |
+| 15 Dec 2023 | hike 15 → 16% | the Bank hinted the hiking cycle may be over. Same day: Sovcombank IPO, Lukoil dividend gap at the open | soft signal → stocks above what bonds say |
+| 11 Sep 2026 | hold at 14% | 23 of 30 economists expected a hold, yet the index fell about 1%. The media also saw a short jump at about 13:20 Moscow (2295 → 2317) before the release | the market priced a cut more than economists did: analyst surveys miss what the market expects, bonds catch it |
+| 24 Jul 2026 | cut 14.25 → 14% | most analysts expected a hold; the index fell more than 2% before the decision, then +1.06% at 13:30 | an unexpected cut, normal reaction |
+| 15 Sep 2023 (key) | hike 12 → 13% | hike of 100 bp was mostly expected; the Bank said more hikes were possible; the US sanctioned 150+ companies the same day | not explained: stocks +0.78% while bonds −0.40% |
+
+Sources: [Moscow Times 24.10.2025](https://ru.themoscowtimes.com/2025/10/24/obobschenie-tsbr-ponizil-stavku-do-1650-povysiv-ee-traektoriyu-na-sleduyuschiy-god-a178296), [Investfuture 15.12.2023](https://investfuture.ru/articles/stavka-16-ts-b-tushit-pozhar-v-ekonomike-lukoyl-uronil-rynok-moschniy-start-sovkombanka-novosti), [Vedomosti 11.09.2026](https://www.vedomosti.ru/investments/news/2026/09/11/1228155-indeks-snizilsya), [Kommersant 24.07.2026](https://www.kommersant.ru/doc/8843967), [Prime 24.07.2026](https://1prime.ru/20260724/aktsii-871749704.html), [Investfuture 15.09.2023](https://investfuture.ru/articles/ts-b-povysil-stavku-chto-dalshe-otskok-mosbirzhi-novye-sanktsii-i-zoloto-na-kolyme-novosti).
