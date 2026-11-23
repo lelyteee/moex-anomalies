@@ -30,9 +30,19 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 
 Also coming:
 
-- **Currency.** Dollar, yuan and gold on decision days. Looks like before 2023 they followed the surprise and after 2023 almost not, the opposite of stocks. Few days before 2023, so need to check it properly.
+- **Currency.** Dollar, yuan and gold on decision days react much weaker than stocks. I thought the link to the surprise disappeared after 2023, but before 2023 there are only 6–11 days and one day flips the result, so I can't say that.
+- **One-minute spikes.** On 21 Jul 2022 at 10:12 Moscow the dollar, yuan and both currency futures jumped 3.5–4% in one minute and mostly came back in the next one, stocks dipped at the same time. I found no news for that minute. Such spikes happen on MOEX every now and then, I want to find all of them and see what comes before.
 - **High and low around 10:30.** What happens inside the first minutes, not only the close.
 - **Every new decision.** I collect minute and 5-second data for each meeting, next one is 18 Dec 2026.
+
+## What holds so far
+
+I rechecked the main results with separate code and stricter controls.
+
+- **Holds.** Since mid-2023 the reaction to the key rate is much bigger and almost instant: in 2025–2026 the first minute is about 90% of the first hour.
+- **Holds, but smaller.** Bonds and stocks move together after the decision, corr somewhere 0.7–0.9, not one clean number: 20 Dec 2024 alone does a lot of it.
+- **Nothing found.** No sign that someone trades in the right direction before 10:30. Volume before the release goes up, but it doesn't guess where the price goes.
+- **Didn't hold.** "The press conference sets the direction for the next days" and "the ruble stopped reacting to the rate after 2023". Both looked nice, both were too weak.
 
 How I compute things and why (bootstrap, controls, placebo etc): [`METHODS.md`](METHODS.md)
 
