@@ -20,11 +20,19 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 
 ## Current work
 
-**Key rate decisions** — how IMOEX reacts to Bank of Russia announcements, minute by minute.
-Results: [`results/key_rate/`](results/key_rate/)
+| Topic | What | Status |
+|---|---|---|
+| [key_rate](results/key_rate/) | how IMOEX reacts to Bank of Russia decisions, minute by minute | done, updating |
+| [pre_decision](results/pre_decision/) | week and morning before the decision, bonds as a surprise measure, banks | done, updating |
+| [after_decision](results/after_decision/) | does the move continue for days after the decision | soon |
+| [cpi_wednesday](results/cpi_wednesday/) | weekly inflation data on Wednesday evenings | soon |
+| [stocks](results/stocks/) | single stocks: pumps, dividends, strange minutes | soon |
 
-**Before and around the decision** — week before, and government bonds as a surprise measure.
-Results: [`results/pre_decision/`](results/pre_decision/)
+Also coming:
+
+- **Currency.** Dollar, yuan and gold on decision days. Looks like before 2023 they followed the surprise and after 2023 almost not, the opposite of stocks. Few days before 2023, so need to check it properly.
+- **High and low around 10:30.** What happens inside the first minutes, not only the close.
+- **Every new decision.** I collect minute and 5-second data for each meeting, next one is 18 Dec 2026.
 
 How I compute things and why (bootstrap, controls, placebo etc): [`METHODS.md`](METHODS.md)
 
@@ -43,6 +51,9 @@ data/imoex_daily.csv          IMOEX daily candles since 2021
 data/banks.csv                banks and Lukoil: tickers and uids
 results/key_rate/             reaction to the decision
 results/pre_decision/         week before, bonds, banks, press conference
+results/after_decision/       days after the decision (soon)
+results/cpi_wednesday/        weekly inflation on Wednesdays (soon)
+results/stocks/               single stocks (soon)
 ```
 
 ## Run
