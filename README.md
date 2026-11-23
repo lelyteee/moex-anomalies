@@ -26,13 +26,18 @@ Results: [`results/key_rate/`](results/key_rate/)
 **Before and around the decision** — week before, and government bonds as a surprise measure.
 Results: [`results/pre_decision/`](results/pre_decision/)
 
+How I compute things and why (bootstrap, controls, placebo etc): [`METHODS.md`](METHODS.md)
+
 ## Structure
 
 ```
 scripts/key_rate.py           index: download candles, compute reactions
 scripts/imoexf.py             IMOEXF futures: price, volume, 5-second candles
 scripts/decision.py           around the decision: daily data, extraordinary meetings, week before,
-                              bonds, drift, banks, small banks, press conference (pick steps at the top)
+                              bonds, drift, banks, small banks, press conference, minute candles,
+                              high / low at 10:30, currency, after the decision (pick steps at the top)
+scripts/collect.py            raw 5-second candles for the last ~30 days (T-Invest doesn't keep more)
+data/instruments.csv          all instruments: ticker, name, kind, uid
 data/cb_kir_decisions.csv     decision dates, rate before / after
 data/imoex_daily.csv          IMOEX daily candles since 2021
 data/banks.csv                banks and Lukoil: tickers and uids
