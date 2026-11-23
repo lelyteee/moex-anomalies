@@ -8,3 +8,7 @@ archive/
 data/daily/
 data/seconds/
 .DS_Store
+data/minutes/
+interim.md
+ideas.md
+results/key_rate/raw/hypotheses.txt

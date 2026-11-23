@@ -9,3 +9,28 @@ VTBR,Банк ВТБ,share,8e2b0325-0292-4654-8a18-4f63ed3b0e09
 T,Т-Технологии,share,87db07bc-0e02-4e29-90bb-05e8ef791d7b
 BSPB,Банк Санкт-Петербург,share,1e19953d-01c6-4ecd-a5f4-53ae3ed44029
 LKOH,ЛУКОЙЛ,share,02cfdf61-6298-4c0f-a9ca-9cabc82afaf3
+SVCB,Совкомбанк,share,1fbecbbc-ef32-448c-b4fe-b0037795ba01
+MBNK,МТС-Банк,share,459a1a0a-0253-465a-bd4e-afaaf5e670b0
+CBOM,МКБ,share,ebfda284-4291-4337-9dfb-f55610d0a907
+ZAYM,Займер,share,1a7766fb-3aa9-4b20-8817-b9b7607c0e7b
+AVAN,Авангард Банк,share,e027aaaa-cb20-4d48-be23-6d2d4b0edfb8
+PRMB,Приморье Банк,share,c0545aeb-b6b1-4ccb-b37e-3eaa427b4717
+KUZB,Кузнецкий Банк,share,879b2e35-edfb-42f4-baa0-8a00cf1edaac
+ROSB,РОСБАНК,share,3fccb7cc-787b-450d-8799-c3c92c1cb76d
+CNYRUB_TOM,Юань к рублю,currency,4587ab1d-a9c9-4910-a0d6-86c7b9c42510
+USDRUBF,Вечный фьючерс на доллар,futures,48706c30-0bd7-42ad-a936-150287cd9de4
+CNYRUBF,Вечный фьючерс на юань,futures,c300543d-aa18-4249-b110-615409dde036
+GLDRUB_TOM,Золото в рублях,currency,258e2b93-54e8-4f2d-ba3d-a507c47e3ae2
+GLDRUBF,Вечный фьючерс на золото в рублях,futures,b347fe28-0d2a-45bf-b3bd-cda8a6ac64e6
+MOEXRE,Индекс недвижимости,index,
+MOEXFN,Индекс финансов,index,abaaa0fe-472d-4240-9679-144dd382e6ce
+GAZP,Газпром,share,962e2a95-02a9-4171-abd7-aa198dbe643a
+ROSN,Роснефть,share,fd417230-19cf-4e7b-9623-f7c9ca18ec6b
+SMLT,ГК Самолет,share,4d813ab1-8bc9-4670-89ea-12bfbab6017d
+X5,Корпоративный Центр Икс 5,share,0964acd0-e2cb-4810-a177-ef4ad8856ff0
+AFLT,Аэрофлот,share,1c69e020-f3b1-455c-affa-45f8b8049234
+MGNT,Магнит,share,ca845f68-6c43-44bc-b584-330d2a1e5eb7
+SBERP,Сбербанк - привилегированные акции,share,c190ff1f-1447-4227-b543-316332699ca5
+GLRX,Глоракс,share,51be1fe4-9fe1-4626-9400-6cd1fb6286c5
+LSRG,Группа ЛСР,share,b2db7bb1-6f04-4c3c-b910-fb7fd8aab52d
+ETLN,Эталон Груп,share,b9dff600-4ca6-4fa9-ba91-df2126548ccc

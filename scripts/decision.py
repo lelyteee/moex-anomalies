@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 load_dotenv()
 token = os.environ["T_INVEST_TOKEN"]
 
-steps = ["daily", "extra", "week", "bonds", "drift", "banks", "small_banks", "press"]
+# all steps: "daily", "extra", "week", "bonds", "drift", "banks", "small_banks", "press", "minutes", "highlow", "currency", "after"
+steps = ["minutes"]
 
 def get_price(x):
     return x.units + x.nano * 1e-9
@@ -547,6 +548,283 @@ def step_press():
             rest = [r["rest"] for r in part]
             out.write(f"3. share of the move after the first hour that comes from 11:59-13:00: corr^2 = {corr(p60, rest) ** 2:.2f}\n")
         out.close()
+
+
+def step_minutes():
+    # saves raw minute candles for every decision day and for the same weekday one week earlier (control)
+    # into data/minutes/DATE_TICKER.csv; files that already exist are skipped
+    instruments = pandas.read_csv("data/instruments.csv", dtype=str)
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+    os.makedirs("data/minutes", exist_ok=True)
+
+    days = []
+    for day in changes["date"]:
+        d = datetime.strptime(day, "%Y-%m-%d")
+        days.append(f"{d:%Y-%m-%d}")
+        days.append(f"{d - timedelta(days=7):%Y-%m-%d}")
+
+    with Client(token) as client:
+        # new instruments without a uid in the file: find it by ticker and save it back
+        instruments = instruments.fillna("")
+        for k in range(len(instruments)):
+            if instruments["uid"][k] == "":
+                for u in client.instruments.find_instrument(query=instruments["ticker"][k]).instruments:
+                    if u.ticker == instruments["ticker"][k]:
+                        instruments.loc[k, "uid"] = u.uid
+                        break
+        instruments.to_csv("data/instruments.csv", index=False)
+
+        for day in days:
+            d = datetime.strptime(day, "%Y-%m-%d")
+            for k in range(len(instruments)):
+                if instruments["uid"][k] == "":
+                    continue
+                path = f"data/minutes/{day}_{instruments['ticker'][k]}.csv"
+                if os.path.exists(path):
+                    continue
+                start = d.replace(hour=3, minute=0, tzinfo=timezone.utc)
+                end = d.replace(hour=21, minute=0, tzinfo=timezone.utc)
+                time.sleep(0.1)
+                rows = []
+                for c in client.market_data.get_candles(from_=start, to=end, interval=CandleInterval.CANDLE_INTERVAL_1_MIN, instrument_id=instruments["uid"][k], candle_source_type=CandleSource.CANDLE_SOURCE_EXCHANGE).candles:
+                    rows.append({"time": f"{c.time:%H:%M}", "open": get_price(c.open), "high": get_price(c.high), "low": get_price(c.low), "close": get_price(c.close), "volume": c.volume})
+                pandas.DataFrame(rows, columns=["time", "open", "high", "low", "close", "volume"]).to_csv(path, index=False)
+
+
+def step_highlow():
+    # around 10:30 UTC on decision days and on control days, from data/minutes:
+    #   pre    = price move 10:24 -> 10:29 (the 5 minutes before the release)
+    #   vol    = volume 10:25-10:29 divided by normal volume (mean per minute 10:00-10:19, times 5)
+    #   high, low, close = the 10:30 minute vs the 10:29 close
+    instruments = pandas.read_csv("data/instruments.csv", dtype=str)
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+
+    def numbers(day, ticker):
+        path = f"data/minutes/{day}_{ticker}.csv"
+        if not os.path.exists(path):
+            return None
+        d = pandas.read_csv(path)
+        close = dict(zip(d["time"], d["close"]))
+        high = dict(zip(d["time"], d["high"]))
+        low = dict(zip(d["time"], d["low"]))
+        vol = dict(zip(d["time"], d["volume"]))
+        if "10:29" not in close or "10:24" not in close or "10:30" not in close:
+            return None
+        base = close["10:29"]
+        normal = sum(vol.get(f"10:{m:02}", 0) for m in range(0, 20)) / 20 * 5
+        pre_vol = sum(vol.get(f"10:{m:02}", 0) for m in range(25, 30))
+        return {"pre": pct(close["10:24"], base), "vol": pre_vol / normal if normal > 0 else None,
+                "high": pct(base, high["10:30"]), "low": pct(base, low["10:30"]), "close": pct(base, close["10:30"])}
+
+    out = open("results/key_rate/raw/highlow.txt", "w")
+    out.write("UTC. pre = move 10:24->10:29, vol = volume 10:25-10:29 / normal (10:00-10:19), high / low / close = minute 10:30 vs 10:29 close\n")
+    out.write("control = the same weekday one week earlier\n\n")
+
+    summary = {}
+    for day in changes["date"]:
+        control = f"{datetime.strptime(day, '%Y-%m-%d') - timedelta(days=7):%Y-%m-%d}"
+        out.write(f"{day}   {changes['rate_before'][changes['date'] == day].iloc[0]:5.2f} -> {changes['rate_after'][changes['date'] == day].iloc[0]:5.2f}\n")
+        out.write("ticker  |   pre      vol  |   high     low    close  | control pre   vol\n")
+        for t in instruments["ticker"]:
+            a = numbers(day, t)
+            if a is None:
+                continue
+            b = numbers(control, t)
+            v = f"{a['vol']:6.1f}" if a["vol"] is not None else "     -"
+            cb = f"{b['pre']:+6.2f} {b['vol']:6.1f}" if b is not None and b["vol"] is not None else "     -      -"
+            out.write(f"{t:7} | {a['pre']:+6.2f}  {v}  | {a['high']:+6.2f}  {a['low']:+6.2f}  {a['close']:+6.2f}  |   {cb}\n")
+            if t not in summary:
+                summary[t] = {"pre": [], "pre_c": [], "vol": [], "vol_c": [], "far": [], "close": [], "same": 0, "n": 0}
+            s = summary[t]
+            s["pre"].append(abs(a["pre"]))
+            s["far"].append(max(abs(a["high"]), abs(a["low"])))
+            s["close"].append(abs(a["close"]))
+            if a["vol"] is not None:
+                s["vol"].append(a["vol"])
+            if b is not None:
+                s["pre_c"].append(abs(b["pre"]))
+                if b["vol"] is not None:
+                    s["vol_c"].append(b["vol"])
+            if abs(a["pre"]) >= 0.1:
+                s["n"] += 1
+                if (a["pre"] > 0) == (a["close"] > 0):
+                    s["same"] += 1
+        out.write("\n")
+
+    def mean(x):
+        return sum(x) / len(x) if len(x) > 0 else 0
+
+    def median(x):
+        return sorted(x)[len(x) // 2] if len(x) > 0 else 0
+
+    out.write("summary over all decisions\n")
+    out.write("mean |pre| = average size of the move 10:24->10:29; vol = median volume ratio 10:25-10:29\n")
+    out.write("far = average farthest point of the 10:30 minute (high or low), close = average |close| of the 10:30 minute\n")
+    out.write("same = among days with |pre| >= 0.1%, how often the 10:30 minute went the same way\n\n")
+    out.write("ticker  days | mean |pre|  decision  control | vol  decision  control |   far   close | same\n")
+    for t in summary:
+        s = summary[t]
+        out.write(f"{t:7} {len(s['pre']):4} |            {mean(s['pre']):6.3f}%  {mean(s['pre_c']):6.3f}% |      {median(s['vol']):6.1f}  {median(s['vol_c']):6.1f}  | {mean(s['far']):5.2f}%  {mean(s['close']):5.2f}% | {s['same']}/{s['n']}\n")
+    out.close()
+
+
+def step_currency():
+    # currency and gold around the decision, from data/minutes (no API needed)
+    # surprise = RGBI 10:29 -> 11:29 (bonds up = softer than expected)
+    # for each instrument: move 10:29 -> 10:30, -> 10:34, -> 11:29, and 10:24 -> 10:29 before the release
+    tickers = ["IMOEX", "USDRUBF", "CNYRUBF", "CNYRUB_TOM", "GLDRUB_TOM", "GLDRUBF"]
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+
+    def close(day, ticker):
+        path = f"data/minutes/{day}_{ticker}.csv"
+        if not os.path.exists(path):
+            return {}
+        d = pandas.read_csv(path)
+        return dict(zip(d["time"], d["close"]))
+
+    def move(c, a, b):
+        if a in c and b in c:
+            return pct(c[a], c[b])
+        return None
+
+    rows = []
+    for day in changes["date"]:
+        control = f"{datetime.strptime(day, '%Y-%m-%d') - timedelta(days=7):%Y-%m-%d}"
+        r = {"date": day, "surprise": move(close(day, "RGBI"), "10:29", "11:29")}
+        for t in tickers:
+            c = close(day, t)
+            r[t + " +1"] = move(c, "10:29", "10:30")
+            r[t + " +5"] = move(c, "10:29", "10:34")
+            r[t + " +60"] = move(c, "10:29", "11:29")
+            r[t + " pre"] = move(c, "10:24", "10:29")
+            r[t + " pre_control"] = move(close(control, t), "10:24", "10:29")
+        rows.append(r)
+
+    def f(x):
+        return f"{x:+6.2f}" if x is not None else "     -"
+
+    out = open("results/key_rate/raw/currency.txt", "w")
+    out.write("UTC. surprise = RGBI 10:29 -> 11:29 (bonds up = softer than expected). USD/RUB up = ruble weaker\n\n")
+    out.write("date        surprise |" + "".join(f" {t:>11} +1    +60 |" for t in tickers) + "\n")
+    for r in rows:
+        out.write(f"{r['date']}  {f(r['surprise'])} |" + "".join(f"      {f(r[t + ' +1'])} {f(r[t + ' +60'])} |" for t in tickers) + "\n")
+
+    out.write("\ncorr with the surprise, and average size of the move (mean |x|)\n")
+    for name, part in [["before jul 2023", [r for r in rows if r["date"] < "2023-07-01"]], ["from jul 2023", [r for r in rows if r["date"] >= "2023-07-01"]]]:
+        out.write(f"\n{name}\n")
+        out.write("ticker        days |  corr +1   +5  +60 | mean |x| +1    +60 | before release |pre|: decision  control\n")
+        for t in tickers:
+            ok = [r for r in part if r["surprise"] is not None and r[t + " +60"] is not None and r[t + " +1"] is not None and r[t + " +5"] is not None]
+            if len(ok) < 5:
+                out.write(f"{t:12} {len(ok):4}  | too few days\n")
+                continue
+            s = [r["surprise"] for r in ok]
+            c1 = corr(s, [r[t + " +1"] for r in ok])
+            c5 = corr(s, [r[t + " +5"] for r in ok])
+            c60 = corr(s, [r[t + " +60"] for r in ok])
+            a1 = sum(abs(r[t + " +1"]) for r in ok) / len(ok)
+            a60 = sum(abs(r[t + " +60"]) for r in ok) / len(ok)
+            pre = sorted(abs(r[t + " pre"]) for r in part if r[t + " pre"] is not None)
+            pc = sorted(abs(r[t + " pre_control"]) for r in part if r[t + " pre_control"] is not None and r["date"] != "2021-04-23")
+            mp = f"{pre[len(pre) // 2]:.3f}%" if len(pre) > 0 else "-"
+            mc = f"{pc[len(pc) // 2]:.3f}%" if len(pc) > 0 else "-"
+            out.write(f"{t:12} {len(ok):4}  | {c1:+.2f} {c5:+.2f} {c60:+.2f} |      {a1:.2f}%  {a60:.2f}% |   median {mp}  {mc}\n")
+    out.write("\ncorr noise level: about 2 / sqrt(days)\n")
+    out.close()
+
+
+def step_after():
+    # 1. morning of the decision day: IMOEX 07:00 -> 10:29 UTC, vs the control day (one week earlier)
+    # 2. days after: does the market keep going in the direction of the decision day?
+    #    rule = sign(day move) * move over the next 1 / 3 / 5 days; positive = the move continued
+    # 3. check against luck: the same rule on ordinary Fridays, many random draws
+    import random
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+    daily = pandas.read_csv("data/imoex_daily.csv")
+    dates = list(daily["date"])
+    close = list(daily["close"])
+    where = {d: i for i, d in enumerate(dates)}
+
+    def minute_close(day, hm):
+        path = f"data/minutes/{day}_IMOEX.csv"
+        if not os.path.exists(path):
+            return None
+        d = pandas.read_csv(path)
+        c = dict(zip(d["time"], d["close"]))
+        return c.get(hm)
+
+    def morning(day):
+        a = minute_close(day, "07:00")
+        b = minute_close(day, "10:29")
+        if a is None or b is None:
+            return None
+        return pct(a, b)
+
+    def rule(day, k):
+        i = where.get(day)
+        if i is None or i < 1 or i + k >= len(close):
+            return None
+        sign = 1 if close[i] > close[i - 1] else -1
+        return sign * pct(close[i], close[i + k])
+
+    def stats(v):
+        v = [x for x in v if x is not None]
+        n = len(v)
+        if n < 3:
+            return f"n {n}"
+        m = sum(v) / n
+        sd = (sum((x - m) ** 2 for x in v) / (n - 1)) ** 0.5
+        up = sum(1 for x in v if x > 0)
+        return f"n {n:3}  mean {m:+.2f}%  t {m / (sd / n ** 0.5):+.1f}  positive {up}/{n}"
+
+    def kind(k):
+        if changes["rate_after"][k] > changes["rate_before"][k]:
+            return "hike"
+        if changes["rate_after"][k] < changes["rate_before"][k]:
+            return "cut"
+        return "hold"
+
+    out = open("results/key_rate/raw/after.txt", "w")
+    out.write("IMOEX. control = the same weekday one week earlier\n\n")
+    out.write("1. morning 07:00 -> 10:29 UTC\n")
+    for name, test in [["before jul 2023", lambda d: d < "2023-07-01"], ["from jul 2023", lambda d: d >= "2023-07-01"]]:
+        out.write(f"\n{name}\n")
+        for kname in ["all", "hike", "hold", "cut"]:
+            dec = []
+            ctl = []
+            for k in range(len(changes)):
+                day = changes["date"][k]
+                if not test(day) or (kname != "all" and kind(k) != kname):
+                    continue
+                control = f"{datetime.strptime(day, '%Y-%m-%d') - timedelta(days=7):%Y-%m-%d}"
+                dec.append(morning(day))
+                ctl.append(morning(control))
+            out.write(f"   {kname:5} decision {stats(dec)}\n         control  {stats(ctl)}\n")
+
+    out.write("\n2. days after the decision: sign of the decision day * move over the next k days\n")
+    decision_days = set(changes["date"])
+    for name, test in [["before jul 2023", lambda d: d < "2023-07-01"], ["from jul 2023", lambda d: d >= "2023-07-01"]]:
+        out.write(f"\n{name}\n")
+        for k in [1, 3, 5]:
+            dec = [rule(d, k) for d in changes["date"] if test(d)]
+            no_dec = [rule(d, k) for d in changes["date"] if test(d) and d != "2024-12-20"]
+            fridays = [rule(d, k) for d in dates if test(d) and d not in decision_days and datetime.strptime(d, "%Y-%m-%d").weekday() == 4]
+            out.write(f"   +{k} days  decision {stats(dec)}\n")
+            out.write(f"            without 20.12.2024 {stats(no_dec)}\n")
+            out.write(f"            all other Fridays {stats(fridays)}\n")
+
+            # 3. luck: draw as many random Fridays as there are decisions, 10000 times
+            dec = [x for x in dec if x is not None]
+            fridays = [x for x in fridays if x is not None]
+            if len(dec) > 0 and len(fridays) >= len(dec):
+                real = sum(dec) / len(dec)
+                better = 0
+                for _ in range(10000):
+                    pick = random.sample(fridays, len(dec))
+                    if sum(pick) / len(pick) >= real:
+                        better += 1
+                out.write(f"            random Fridays as good or better: {better / 100:.1f}% of 10000 draws\n")
+    out.close()
 
 
 for s in steps:
