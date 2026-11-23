@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 token = os.environ["T_INVEST_TOKEN"]
 
-# all steps: "daily", "extra", "week", "bonds", "drift", "banks", "small_banks", "press", "minutes", "highlow", "currency", "after"
+# all steps: "daily", "extra", "week", "bonds", "drift", "banks", "small_banks", "press", "minutes", "highlow", "currency", "after", "faster"
 steps = ["minutes"]
 
 def get_price(x):
@@ -824,6 +824,99 @@ def step_after():
                     if sum(pick) / len(pick) >= real:
                         better += 1
                 out.write(f"            random Fridays as good or better: {better / 100:.1f}% of 10000 draws\n")
+    out.close()
+
+
+def step_faster():
+    # is the reaction to the decision bigger and faster than before jul 2023?
+    # base = IMOEX close at 10:29 UTC, moves to 10:30 (1 min), 10:39 (10 min), 11:29 (1 hour), 15:39 (close)
+    # 1. mean |move| on decision days vs control days (same weekday a week earlier), ratio, bootstrap by dates
+    # 2. by year: how much of the 1 hour move is already there after 1 minute, and same sign or not
+    import random
+    random.seed(1)
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+    windows = [["1 min", "10:30"], ["10 min", "10:39"], ["1 hour", "11:29"], ["close", "15:39"]]
+
+    def moves(day):
+        path = f"data/minutes/{day}_IMOEX.csv"
+        if not os.path.exists(path):
+            return None
+        d = pandas.read_csv(path)
+        c = dict(zip(d["time"], d["close"]))
+        if "10:29" not in c:
+            return None
+        base = c["10:29"]
+        # one bad print at 10:29 (16.04.2021: -2.6% and back in the next minute) -> use 10:28
+        if "10:28" in c and "10:30" in c and abs(pct(c["10:28"], base)) > 1 and abs(pct(c["10:28"], c["10:30"])) < 0.2:
+            base = c["10:28"]
+        res = []
+        for name, hm in windows:
+            # last minute at or before hm (the index sometimes skips a minute)
+            t = [x for x in d["time"] if x <= hm]
+            res.append(pct(base, c[t[-1]]))
+        return res
+
+    def mean(v):
+        return sum(v) / len(v)
+
+    out = open("results/key_rate/raw/faster.txt", "w")
+    out.write("IMOEX, UTC, base = close at 10:29. control = the same weekday one week earlier\n")
+    out.write("mean |move| on decision days and control days, ratio = decision / control, 95% interval = bootstrap by dates\n")
+    for name, test in [["before jul 2023", lambda d: d < "2023-07-01"], ["from jul 2023", lambda d: d >= "2023-07-01"]]:
+        dec = []
+        ctl = []
+        for day in changes["date"]:
+            if not test(day):
+                continue
+            control = f"{datetime.strptime(day, '%Y-%m-%d') - timedelta(days=7):%Y-%m-%d}"
+            a = moves(day)
+            b = moves(control)
+            if a is None or b is None:
+                continue
+            dec.append(a)
+            ctl.append(b)
+        n = len(dec)
+        out.write(f"\n{name}, {n} days\n")
+        out.write("window    decision  control   ratio   95%\n")
+        for w in range(len(windows)):
+            x = [abs(v[w]) for v in dec]
+            y = [abs(v[w]) for v in ctl]
+            r = mean(x) / mean(y)
+            boot = []
+            for _ in range(10000):
+                pick = [random.randrange(n) for _ in range(n)]
+                boot.append(mean([x[i] for i in pick]) / mean([y[i] for i in pick]))
+            boot.sort()
+            out.write(f"{windows[w][0]:8}  {mean(x):6.3f}%  {mean(y):6.3f}%  {r:6.1f}   [{boot[250]:.1f}; {boot[9750]:.1f}]\n")
+
+    out.write("\nby year: share = (1 min move) / (1 hour move), median over decisions; same sign = 1 min and 1 hour in the same direction\n")
+    out.write("year  days  median share  same sign\n")
+    for year in range(2021, 2027):
+        v = []
+        for day in changes["date"]:
+            if day[:4] != str(year):
+                continue
+            a = moves(day)
+            if a is None or a[2] == 0:
+                continue
+            v.append(a[0] / a[2])
+        if len(v) == 0:
+            continue
+        v.sort()
+        med = v[len(v) // 2] if len(v) % 2 == 1 else (v[len(v) // 2 - 1] + v[len(v) // 2]) / 2
+        same = sum(1 for x in v if x > 0)
+        out.write(f"{year}  {len(v):4}  {med:12.2f}  {same:4}/{len(v)}\n")
+    for name, test in [["before jul 2023", lambda d: d < "2023-07-01"], ["from jul 2023", lambda d: d >= "2023-07-01"]]:
+        same = 0
+        n = 0
+        for day in changes["date"]:
+            a = moves(day)
+            if not test(day) or a is None or a[2] == 0:
+                continue
+            n += 1
+            if a[0] * a[2] > 0:
+                same += 1
+        out.write(f"{name}: same sign {same}/{n}\n")
     out.close()
 
 

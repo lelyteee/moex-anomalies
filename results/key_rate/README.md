@@ -15,8 +15,9 @@ What happens to the Russian stock market in the minutes when the Bank of Russia 
 
 - **Is there a jump?** Yes. Since mid-2023 the index moves 0.5–2% in the first minute after the decision. Usually the move then holds for at least an hour.
 - **Which way?** The decision alone does not tell: a rate hike can push the market up or down. What decides is the surprise. When bonds rise after the decision, stocks rise; when bonds fall, stocks fall (corr +0.86 over 44 decisions, see [pre_decision](../pre_decision/)).
-- **Since when?** Before mid-2023 the market barely reacted. Since then the reaction is about 15× bigger.
-- **Why?** Two parts, measured on bonds: surprises became about 4× bigger, and stocks became about 3× more sensitive to the same surprise.
+- **Since when?** Before mid-2023 the market barely reacted. Since then the first minute is about 15× bigger than before (0.05% → 0.73%), but the first hour only about 2.5×. Compared with an ordinary day, the first minute now moves about 19× more, the hour about 4×.
+- **Faster every year.** In 2021–2022 the first minute was a tiny part of the hourly move. In 2025–2026 it's about 90% of it. The market prices the decision almost instantly now.
+- **Why?** Not clear yet. I first split it on bonds: surprises about 4× bigger, stocks about 3× more sensitive. But RGBI is slow (it's built from weighted average prices) and partly follows stocks, so it can't split it like that.
 - **Anything suspicious?** On 4 days the market moved 0.4–1.2% in the minutes *before* the announcement. Checked on futures: these were real trades. Not explained yet.
 
 Raw data: [`results_2.txt`](raw/results_2.txt) (moves after 10:29), [`results_1.txt`](raw/results_1.txt) (first version, windows around 10:30), [`around_1030.txt`](raw/around_1030.txt) (every minute 10:25–10:35).
@@ -38,9 +39,31 @@ Raw data: [`results_2.txt`](raw/results_2.txt) (moves after 10:29), [`results_1.
 | Mar 2021 – Jun 2023 | 18 | 0.05% | 0.13% | 0.53% |
 | Jul 2023 – Oct 2026 | 27 | 0.73% | 0.83% | 1.59% |
 
+But I shouldn't compare with zero, ordinary days also move. Same minutes on the control day (same weekday a week earlier), decision day divided by control day. Raw: [`faster.txt`](raw/faster.txt), code: step `faster` in `decision.py`.
+
+| Period | Days | 1 min | 10 min | 1 hour | to the close |
+|---|---|---|---|---|---|
+| Mar 2021 – Jun 2023 | 18 | 1.4× | 2.3× | 1.9× | 1.0× |
+| Jul 2023 – Oct 2026 | 26 | 18.7× | 12.0× | 4.1× | 2.7× |
+
+So "15× bigger" is true only for the first minute. Over the hour the reaction grew about 2.5× (0.34% → 0.85%), to the close about 3× (0.51% → 1.57%). The 95% intervals (bootstrap by dates, see [METHODS](../../METHODS.md)) are in the raw file, since Jul 2023 none of them gets close to 1.
+
 The new period starts with the emergency decision of 15 Aug 2023 (8.5% → 12%, after the ruble fell below 100 per dollar). See finding 8.
 
 **3. The move happens in the first minute and holds.** In all 18 regular meetings with a move of 0.5% or more in the first 5 minutes, the market was still on the same side an hour later. The only clear U-turn is 15 Aug 2023.
+
+And it gets faster every year. Share = (1 min move) / (1 hour move), median over the decisions of the year. Same sign = the first minute and the hour went the same way.
+
+| Year | Days | Share | Same sign |
+|---|---|---|---|
+| 2021 | 7 | −0.02 | 3/7 |
+| 2022 | 7 | 0.10 | 5/7 |
+| 2023 | 8 | 0.24 | 5/8 |
+| 2024 | 8 | 0.45 | 6/8 |
+| 2025 | 8 | 0.92 | 6/8 |
+| 2026 | 7 | 0.87 | 7/7 |
+
+In 2021 the first minute said nothing about the hour. In 2026 it's almost the whole hour and the direction matched 7 of 7. My guess is algos that read the release and trade within seconds, but minute candles can't show that. 5-second data from the next decisions should.
 
 **4. Expectations matter more than the decision.**
 
