@@ -1,0 +1,19 @@
+IMOEX, UTC. control = same weekday a week earlier, difference = decision - control for the same pair, 95% = bootstrap by dates
+
+before jul 2023, 18 pairs
+window               decision   up    control   up    difference  95%
+prev close -> 10:29   -0.05%   8/18   -0.21%   5/18    +0.16%  [-0.66; +0.87]
+07:00 -> 10:29        +0.18%  12/18   -0.16%  11/18    +0.33%  [-0.16; +0.83]
+07:00 -> 08:30        +0.17%  12/18   -0.11%   8/18    +0.28%  [-0.11; +0.69]
+08:30 -> 10:29        +0.01%  11/18   -0.04%  10/18    +0.06%  [-0.20; +0.32]
+does the morning 07:00 -> 10:29 guess the move after the release (10:29 -> 11:29)? corr -0.05, same sign 12/18 (noise level about 0.47)
+by year, 07:00 -> 10:29 on decision days: 2021: +0.11% (4/7)  2022: +0.40% (6/7)  2023: -0.10% (2/4)  
+
+from jul 2023, 26 pairs
+window               decision   up    control   up    difference  95%
+prev close -> 10:29   +0.24%  19/26   +0.24%  16/26    -0.00%  [-0.51; +0.51]
+07:00 -> 10:29        +0.19%  20/26   -0.00%  14/26    +0.20%  [-0.10; +0.50]
+07:00 -> 08:30        +0.12%  16/26   -0.01%  13/26    +0.14%  [-0.11; +0.37]
+08:30 -> 10:29        +0.07%  14/26   +0.01%  12/26    +0.06%  [-0.24; +0.35]
+does the morning 07:00 -> 10:29 guess the move after the release (10:29 -> 11:29)? corr +0.23, same sign 11/26 (noise level about 0.39)
+by year, 07:00 -> 10:29 on decision days: 2023: +0.24% (3/4)  2024: +0.36% (7/8)  2025: +0.04% (5/8)  2026: +0.15% (5/6)  

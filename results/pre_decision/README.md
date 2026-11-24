@@ -35,6 +35,10 @@ What happens in the week before a Bank of Russia decision, what bonds tell about
 
 Softer than expected → stocks up. Harder → stocks down. The surprise decides the direction, not the decision itself.
 
+How solid is 0.90 ([`bonds_check.txt`](raw/bonds_check.txt), step `bonds_check`): bootstrap by dates gives [0.50; 0.98], without 20 Dec 2024 it's 0.70, rank corr 0.74. So the link is strong, but 0.90 is the optimistic end.
+
+And there's a catch. The first minute of IMOEX predicts where RGBI goes over the next hour (corr +0.70), the other way it doesn't work (−0.44). RGBI is built from weighted average prices, so it's slow and partly just follows stocks. It's a good hint about the surprise, but not a clean outside measure of it.
+
 **3. Why the reaction became 15× bigger in 2023.**
 
 | | before Jul 2023 | since Jul 2023 | × |
@@ -42,7 +46,7 @@ Softer than expected → stocks up. Harder → stocks down. The surprise decides
 | Size of the surprise (bonds, first hour) | 0.08% | 0.33% | 4 |
 | Index move per 1% of bonds | 0.75% | 2.20% | 3 |
 
-The Bank started to surprise more (4×) and stocks started to react more to the same surprise (3×). 4 × 3 ≈ 12–15. The "before" sensitivity is rough: surprises were tiny then.
+The Bank started to surprise more (4×) and stocks started to react more to the same surprise (3×). 4 × 3 ≈ 12–15. But after the catch in finding 2 I don't trust this split: if RGBI partly follows stocks, "bigger surprise" and "more sensitive" get mixed. The "before" sensitivity is also rough, surprises were tiny then. To split it properly I need a surprise measure that doesn't depend on stocks, like analyst consensus.
 
 **4. Rate cuts in 2025–2026.** The index fell on 8 of 10 cut days. In the 6 cuts where bonds fell (the cut was harder than hoped), the index fell every time. Not "buy the rumor, sell the news", but disappointing cuts.
 
@@ -107,7 +111,7 @@ Before Jul 2023 there was no difference. The press conference explains most of t
 | corr bonds vs stocks | +0.63 | **+0.96** |
 | move not explained by bonds | 0.43% | 0.32% |
 
-On regular meetings bonds explain the stock reaction almost completely. On key meetings much worse: part of the surprise is in the forecast, and the bond index catches it badly. 15 Sep 2023, when stocks went most against bonds (+0.78% while bonds −0.40%), was a key meeting.
+On regular meetings bonds explain the stock reaction almost completely. On key meetings much worse: part of the surprise is in the forecast, and the bond index catches it badly. But it's only 15 vs 12 meetings: a random split of the same meetings gives the same or bigger difference in 29% of cases, so this is an idea, not a result. 15 Sep 2023, when stocks went most against bonds (+0.78% while bonds −0.40%), was a key meeting.
 
 **11. News on the strange days.** Days where stocks moved far from what bonds explain, checked against the news:
 
@@ -120,3 +124,24 @@ On regular meetings bonds explain the stock reaction almost completely. On key m
 | 15 Sep 2023 (key) | hike 12 → 13% | hike of 100 bp was mostly expected; the Bank said more hikes were possible; the US sanctioned 150+ companies the same day | not explained: stocks +0.78% while bonds −0.40% |
 
 Sources: [Moscow Times 24.10.2025](https://ru.themoscowtimes.com/2025/10/24/obobschenie-tsbr-ponizil-stavku-do-1650-povysiv-ee-traektoriyu-na-sleduyuschiy-god-a178296), [Investfuture 15.12.2023](https://investfuture.ru/articles/stavka-16-ts-b-tushit-pozhar-v-ekonomike-lukoyl-uronil-rynok-moschniy-start-sovkombanka-novosti), [Vedomosti 11.09.2026](https://www.vedomosti.ru/investments/news/2026/09/11/1228155-indeks-snizilsya), [Kommersant 24.07.2026](https://www.kommersant.ru/doc/8843967), [Prime 24.07.2026](https://1prime.ru/20260724/aktsii-871749704.html), [Investfuture 15.09.2023](https://investfuture.ru/articles/ts-b-povysil-stavku-chto-dalshe-otskok-mosbirzhi-novye-sanktsii-i-zoloto-na-kolyme-novosti).
+
+**12. Developers don't move before the release.** If someone knew the decision, developers would be the best place to trade it: after the release they move about 2× the index (here developers minus IMOEX after 10:30 goes with IMOEX at corr +0.90). And they get less attention than the futures. So I checked: does Samolet, LSR, Etalon, Glorax (average) minus IMOEX before 10:30 go the way the market goes after? Raw: [`dev_leak.txt`](raw/dev_leak.txt), step `dev_leak`.
+
+| Since Jul 2023, 27 decisions | corr with IMOEX after | same direction | control days corr |
+|---|---|---|---|
+| morning 07:00–10:29 | −0.28 | 11 of 27 | +0.13 |
+| 10:00–10:29 | −0.12 | 13 of 27 | −0.04 |
+| 10:24–10:29 | −0.29 | 9 of 27 | +0.29 |
+
+All inside the noise (±0.38), and if anything the wrong way. In the last 5 minutes developers move more than usual relative to the index (0.17% vs 0.07% on control days), but in random directions. So more trading before the release, no knowledge, same as with the index and banks.
+
+**13. No "pre-FOMC drift" here.** In the US stocks rise in the day before Fed decisions (Lucca and Moench, 2015), it's a known anomaly. The first runs here said IMOEX rises in the morning before a decision too. Checked against the control day of each meeting. Raw: [`morning_check.txt`](raw/morning_check.txt), step `morning_check`.
+
+| Since Jul 2023, 26 pairs | decision | up | control | difference, 95% |
+|---|---|---|---|---|
+| previous close → 10:29 | +0.24% | 19 of 26 | +0.24% | +0.00 [−0.51; +0.51] |
+| 07:00 → 10:29 | +0.19% | 20 of 26 | −0.00% | +0.20 [−0.10; +0.50] |
+| 07:00 → 08:30 | +0.12% | 16 of 26 | −0.01% | +0.14 [−0.11; +0.37] |
+| 08:30 → 10:29 | +0.07% | 14 of 26 | +0.01% | +0.06 [−0.24; +0.35] |
+
+The morning goes up on 20 of 26 decision days, but against its own control day the difference includes zero. And over the whole time from the previous close it's exactly the same as the control: the morning rise just makes up for a weaker night. The morning also doesn't guess where the market goes after the release (corr +0.23, same sign 11 of 26, noise ±0.39). So it's at most a weak "maybe", not an anomaly.

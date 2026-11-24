@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 load_dotenv()
 token = os.environ["T_INVEST_TOKEN"]
 
-# all steps: "daily", "extra", "week", "bonds", "drift", "banks", "small_banks", "press", "minutes", "highlow", "currency", "after", "faster"
+# all steps: "daily", "extra", "week", "bonds", "drift", "banks", "small_banks", "press", "minutes", "highlow", "currency", "after", "faster", "bonds_check", "highlow_check", "dev_leak", "morning_check", "sectors"
 steps = ["minutes"]
 
 def get_price(x):
@@ -917,6 +917,467 @@ def step_faster():
             if a[0] * a[2] > 0:
                 same += 1
         out.write(f"{name}: same sign {same}/{n}\n")
+    out.close()
+
+
+def step_bonds_check():
+    # how solid is "bonds explain stocks"? since jul 2023, from data/minutes, base = close at 10:29 UTC
+    # 1. corr of the first hour IMOEX vs RGBI: bootstrap by dates, without each date, rank corr
+    # 2. who is first: IMOEX first minute vs RGBI after it (10:30 -> 11:29), and the other way round
+    # 3. key vs regular meetings: is the difference in corr more than a random split gives
+    import random
+    random.seed(1)
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+
+    def closes(day, ticker):
+        path = f"data/minutes/{day}_{ticker}.csv"
+        if not os.path.exists(path):
+            return None
+        d = pandas.read_csv(path)
+        return dict(zip(d["time"], d["close"]))
+
+    def at(c, hm):
+        # last price at or before hm
+        t = [x for x in c if x <= hm]
+        return c[max(t)] if t else None
+
+    def ranks(v):
+        order = sorted(range(len(v)), key=lambda i: v[i])
+        r = [0] * len(v)
+        for k, i in enumerate(order):
+            r[i] = k + 1
+        return r
+
+    days = []
+    stocks = []
+    bonds = []
+    s1 = []
+    b_after = []
+    s_after = []
+    b5 = []
+    for day in changes["date"]:
+        if day < "2023-07-01":
+            continue
+        i = closes(day, "IMOEX")
+        b = closes(day, "RGBI")
+        if i is None or b is None or "10:29" not in i or "10:29" not in b:
+            continue
+        days.append(day)
+        stocks.append(pct(i["10:29"], at(i, "11:29")))
+        bonds.append(pct(b["10:29"], at(b, "11:29")))
+        s1.append(pct(i["10:29"], at(i, "10:30")))
+        b_after.append(pct(at(b, "10:30"), at(b, "11:29")))
+        b5.append(pct(b["10:29"], at(b, "10:34")))
+        s_after.append(pct(at(i, "10:34"), at(i, "11:29")))
+    n = len(days)
+
+    out = open("results/pre_decision/raw/bonds_check.txt", "w")
+    out.write(f"since jul 2023, {n} decisions, UTC, base = close at 10:29. noise level for corr about {2 / n ** 0.5:.2f}\n\n")
+    out.write("1. first hour, IMOEX vs RGBI\n")
+    out.write(f"   corr {corr(stocks, bonds):+.2f}, rank corr {corr(ranks(stocks), ranks(bonds)):+.2f}\n")
+    boot = []
+    for _ in range(10000):
+        pick = [random.randrange(n) for _ in range(n)]
+        boot.append(corr([stocks[k] for k in pick], [bonds[k] for k in pick]))
+    boot.sort()
+    out.write(f"   bootstrap by dates 95%: [{boot[250]:+.2f}; {boot[9750]:+.2f}]\n")
+    loo = []
+    for k in range(n):
+        loo.append([corr(stocks[:k] + stocks[k + 1:], bonds[:k] + bonds[k + 1:]), days[k]])
+    loo.sort()
+    out.write(f"   without one date: from {loo[0][0]:+.2f} (without {loo[0][1]}) to {loo[-1][0]:+.2f}\n")
+
+    out.write("\n2. who is first\n")
+    out.write(f"   IMOEX first minute vs RGBI after it (10:30 -> 11:29): corr {corr(s1, b_after):+.2f}\n")
+    out.write(f"   RGBI first 5 minutes vs IMOEX after them (10:34 -> 11:29): corr {corr(b5, s_after):+.2f}\n")
+    out.write("   if stocks predict later bonds, RGBI is slow and partly follows stocks: it's not a clean outside measure of the surprise\n")
+
+    out.write("\n3. key meetings (feb, apr, jul, oct + 15 sep 2023) vs regular\n")
+    key = [d[5:7] in ["02", "04", "07", "10"] or d == "2023-09-15" for d in days]
+    ks = [stocks[k] for k in range(n) if key[k]]
+    kb = [bonds[k] for k in range(n) if key[k]]
+    rs = [stocks[k] for k in range(n) if not key[k]]
+    rb = [bonds[k] for k in range(n) if not key[k]]
+    diff = corr(rs, rb) - corr(ks, kb)
+    out.write(f"   key {len(ks)}: corr {corr(ks, kb):+.2f}   regular {len(rs)}: corr {corr(rs, rb):+.2f}   difference {diff:+.2f}\n")
+    better = 0
+    for _ in range(10000):
+        lab = key[:]
+        random.shuffle(lab)
+        a = [k for k in range(n) if lab[k]]
+        b = [k for k in range(n) if not lab[k]]
+        d = corr([stocks[k] for k in b], [bonds[k] for k in b]) - corr([stocks[k] for k in a], [bonds[k] for k in a])
+        if abs(d) >= abs(diff):
+            better += 1
+    out.write(f"   random splits with the same or bigger difference: {better / 100:.1f}% of 10000\n")
+    out.close()
+
+
+def step_highlow_check():
+    # what close hides: high and low inside the minutes around 10:30 UTC
+    # base = close at 10:29, control = same weekday a week earlier
+    # range   = (high - low) of the minute 10:30
+    # retrace = which part of a big move inside a minute came back by its close
+    #           decision days: the minute 10:30; ordinary: every minute of the control days that went >= 0.3%
+    # hidden  = a minute where the price went >= 0.3% from the previous close, but closed within 1/3 of that
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+    tickers = ["IMOEX", "IMOEXF", "SBER", "VTBR", "T", "GAZP", "LKOH", "SMLT"]
+
+    def candles(day, ticker):
+        path = f"data/minutes/{day}_{ticker}.csv"
+        if not os.path.exists(path):
+            return None
+        d = pandas.read_csv(path)
+        res = {}
+        for k in range(len(d)):
+            res[d["time"][k]] = [d["open"][k], d["high"][k], d["low"][k], d["close"][k], d["volume"][k]]
+        return res
+
+    def move(prev, candle):
+        # how far the minute went from the previous close, where it closed, and the part that came back
+        o, h, l, cl, v = candle
+        up = (h - prev) / prev * 100
+        down = (l - prev) / prev * 100
+        went = up if abs(up) >= abs(down) else down
+        closed = (cl - prev) / prev * 100
+        return went, closed, (went - closed) / went if went != 0 else 0
+
+    def mean(v):
+        return sum(v) / len(v)
+
+    def control_of(day):
+        return f"{datetime.strptime(day, '%Y-%m-%d') - timedelta(days=7):%Y-%m-%d}"
+
+    new = [d for d in changes["date"] if d >= "2023-07-01"]
+    out = open("results/key_rate/raw/highlow_check.txt", "w")
+    out.write("UTC, since jul 2023. base = close at 10:29, control = same weekday a week earlier\n")
+
+    out.write("\n1. range of the minute 10:30 (high - low)\n")
+    out.write("ticker  days   decision   control   ratio\n")
+    for t in tickers:
+        rd = []
+        rc = []
+        for day in new:
+            a = candles(day, t)
+            b = candles(control_of(day), t)
+            if a is None or b is None or "10:29" not in a or "10:30" not in a or "10:29" not in b or "10:30" not in b:
+                continue
+            rd.append((a["10:30"][1] - a["10:30"][2]) / a["10:29"][3] * 100)
+            rc.append((b["10:30"][1] - b["10:30"][2]) / b["10:29"][3] * 100)
+        if len(rd) >= 5:
+            out.write(f"{t:6} {len(rd):4}   {mean(rd):6.3f}%   {mean(rc):6.3f}%  {mean(rd) / mean(rc):5.1f}\n")
+
+    out.write("\n2. retrace: part of the move that came back by the close of the minute\n")
+    out.write("ticker   minute 10:30 on decision days   big minutes (>= 0.3%) on ordinary days\n")
+    for t in tickers:
+        dec = []
+        ordi = []
+        for day in new:
+            a = candles(day, t)
+            if a is not None and "10:29" in a and "10:30" in a:
+                went, closed, back = move(a["10:29"][3], a["10:30"])
+                if abs(went) >= 0.3:
+                    dec.append(back)
+            b = candles(control_of(day), t)
+            if b is None:
+                continue
+            times = sorted(b)
+            for k in range(1, len(times)):
+                if "07:00" <= times[k] <= "15:39":
+                    went, closed, back = move(b[times[k - 1]][3], b[times[k]])
+                    if abs(went) >= 0.3:
+                        ordi.append(back)
+        if len(dec) >= 5 and len(ordi) >= 5:
+            out.write(f"{t:6}   {mean(dec) * 100:4.0f}% ({len(dec)} days)                 {mean(ordi) * 100:4.0f}% ({len(ordi)} minutes)\n")
+
+    out.write("\n3. hidden moves (went >= 0.3%, closed within 1/3 of it): how many instrument-minutes\n")
+    out.write("window          decision days   control days\n")
+    for w, lo, hi in [["10:25-10:29", "10:25", "10:29"], ["10:30-10:35", "10:30", "10:35"]]:
+        cnt = [0, 0]
+        for j, which in enumerate(["decision", "control"]):
+            for day in new:
+                d = day if which == "decision" else control_of(day)
+                for t in tickers:
+                    c = candles(d, t)
+                    if c is None:
+                        continue
+                    times = sorted(c)
+                    for k in range(1, len(times)):
+                        if lo <= times[k] <= hi:
+                            went, closed, back = move(c[times[k - 1]][3], c[times[k]])
+                            if abs(went) >= 0.3 and abs(closed) < abs(went) / 3:
+                                cnt[j] += 1
+        out.write(f"{w}     {cnt[0]:6}          {cnt[1]:6}\n")
+
+    out.write("\n4. hidden moves before the release (10:25-10:29) on decision days, all years\n")
+    out.write("date        ticker  time   went     closed   first minute after (10:29 -> 10:30)\n")
+    for day in changes["date"]:
+        for t in tickers:
+            c = candles(day, t)
+            if c is None or "10:29" not in c or "10:30" not in c:
+                continue
+            times = sorted(c)
+            for k in range(1, len(times)):
+                if "10:25" <= times[k] <= "10:29":
+                    went, closed, back = move(c[times[k - 1]][3], c[times[k]])
+                    if abs(went) >= 0.3 and abs(closed) < abs(went) / 3:
+                        after = pct(c["10:29"][3], c["10:30"][3])
+                        out.write(f"{day}  {t:6}  {times[k]}  {went:+6.2f}%  {closed:+6.2f}%   {after:+6.2f}%\n")
+    out.close()
+
+
+def step_dev_leak():
+    # if someone knows the decision, the best place to trade it is developers: they move about 2x the index
+    # check: do developers move relative to the index BEFORE 10:30 in the direction the market goes AFTER?
+    # developers = average of SMLT, LSRG, ETLN, GLRX (whatever has a price), relative = developers - IMOEX
+    # after = IMOEX 10:29 -> 11:29. control = same weekday a week earlier, same windows
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+    devs = ["SMLT", "LSRG", "ETLN", "GLRX"]
+    windows = [["morning 07:00-10:29", "07:00"], ["10:00-10:29", "10:00"], ["10:24-10:29", "10:24"]]
+
+    def closes(day, ticker):
+        path = f"data/minutes/{day}_{ticker}.csv"
+        if not os.path.exists(path):
+            return None
+        d = pandas.read_csv(path)
+        return dict(zip(d["time"], d["close"]))
+
+    def at(c, hm):
+        t = [x for x in c if x <= hm]
+        return c[max(t)] if t else None
+
+    def numbers(day):
+        i = closes(day, "IMOEX")
+        if i is None or "10:29" not in i:
+            return None
+        # one bad print at 10:29 (16.04.2021) breaks everything, skip such a day
+        if "10:28" in i and "10:30" in i and abs(pct(i["10:28"], i["10:29"])) > 1 and abs(pct(i["10:28"], i["10:30"])) < 0.2:
+            return None
+        res = {"after": pct(i["10:29"], at(i, "11:29")), "dev_after": None}
+        for name, start in windows:
+            if at(i, start) is None:
+                return None
+            moves = []
+            moves_after = []
+            for t in devs:
+                c = closes(day, t)
+                if c is None or at(c, start) is None or at(c, "10:29") is None:
+                    continue
+                moves.append(pct(at(c, start), at(c, "10:29")))
+                if at(c, "11:29") is not None:
+                    moves_after.append(pct(at(c, "10:29"), at(c, "11:29")))
+            if len(moves) == 0:
+                return None
+            res[name] = sum(moves) / len(moves) - pct(at(i, start), i["10:29"])
+            if len(moves_after) > 0:
+                res["dev_after"] = sum(moves_after) / len(moves_after) - res["after"]
+        return res
+
+    out = open("results/pre_decision/raw/dev_leak.txt", "w")
+    out.write("developers (SMLT, LSRG, ETLN, GLRX) minus IMOEX before 10:30 UTC vs IMOEX after (10:29 -> 11:29)\n")
+    out.write("control = same weekday a week earlier. same sign = developers before went the way IMOEX went after\n")
+    for pname, test in [["before jul 2023", lambda d: d < "2023-07-01"], ["from jul 2023", lambda d: d >= "2023-07-01"]]:
+        dec = []
+        ctl = []
+        for day in changes["date"]:
+            if not test(day):
+                continue
+            a = numbers(day)
+            b = numbers(f"{datetime.strptime(day, '%Y-%m-%d') - timedelta(days=7):%Y-%m-%d}")
+            if a is not None:
+                dec.append(a)
+            if b is not None:
+                ctl.append(b)
+        out.write(f"\n{pname}: {len(dec)} decision days, {len(ctl)} control days, noise level for corr about {2 / len(dec) ** 0.5:.2f}\n")
+        out.write("window                 | decision: corr  same sign  mean |rel| | control: corr  same sign  mean |rel|\n")
+        for name, start in windows:
+            line = f"{name:22} |"
+            for v in [dec, ctl]:
+                x = [r[name] for r in v]
+                y = [r["after"] for r in v]
+                same = sum(1 for k in range(len(x)) if x[k] * y[k] > 0)
+                line += f"   {corr(x, y):+.2f}    {same:2}/{len(x):2}      {sum(abs(z) for z in x) / len(x):.2f}%   |"
+            out.write(line + "\n")
+        part = [r for r in dec if r["dev_after"] is not None]
+        x = [r["after"] for r in part]
+        y = [r["dev_after"] for r in part]
+        out.write(f"   check: developers minus IMOEX after the release vs IMOEX after: corr {corr(x, y):+.2f}, slope {slope(x, y):+.2f} (positive = developers move more than the index)\n")
+    out.close()
+
+
+def step_morning_check():
+    # does the market go up in the morning before a decision? (in the US: "pre-FOMC drift", stocks rise before Fed decisions)
+    # IMOEX, UTC. windows: previous day close -> 10:29, 07:00 -> 10:29, and the morning split into 07:00 -> 08:30 and 08:30 -> 10:29
+    # control = same weekday a week earlier. difference = decision - control for the same pair, bootstrap by dates
+    # plus: does the morning guess where the market goes after the release (10:29 -> 11:29)?
+    import random
+    random.seed(1)
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+    daily = pandas.read_csv("data/imoex_daily.csv")
+    prev_close = {}
+    for k in range(1, len(daily)):
+        prev_close[daily["date"][k]] = daily["close"][k - 1]
+    windows = [["prev close -> 10:29", None, "10:29"], ["07:00 -> 10:29", "07:00", "10:29"], ["07:00 -> 08:30", "07:00", "08:30"], ["08:30 -> 10:29", "08:30", "10:29"]]
+
+    def closes(day):
+        path = f"data/minutes/{day}_IMOEX.csv"
+        if not os.path.exists(path):
+            return None
+        d = pandas.read_csv(path)
+        return dict(zip(d["time"], d["close"]))
+
+    def at(c, hm):
+        t = [x for x in c if x <= hm]
+        return c[max(t)] if t else None
+
+    def moves(day):
+        c = closes(day)
+        if c is None or "10:29" not in c or at(c, "07:00") is None:
+            return None
+        # one bad print at 10:29 (16.04.2021): use 10:28
+        if "10:28" in c and "10:30" in c and abs(pct(c["10:28"], c["10:29"])) > 1 and abs(pct(c["10:28"], c["10:30"])) < 0.2:
+            c["10:29"] = c["10:28"]
+        res = []
+        for name, a, b in windows:
+            if a is None:
+                res.append(pct(prev_close[day], c[b]) if day in prev_close else None)
+            else:
+                res.append(pct(at(c, a), at(c, b)))
+        res.append(pct(c["10:29"], at(c, "11:29")))
+        return res
+
+    def mean(v):
+        return sum(v) / len(v)
+
+    out = open("results/pre_decision/raw/morning_check.txt", "w")
+    out.write("IMOEX, UTC. control = same weekday a week earlier, difference = decision - control for the same pair, 95% = bootstrap by dates\n")
+    for pname, test in [["before jul 2023", lambda d: d < "2023-07-01"], ["from jul 2023", lambda d: d >= "2023-07-01"]]:
+        pairs = []
+        for day in changes["date"]:
+            if not test(day):
+                continue
+            a = moves(day)
+            b = moves(f"{datetime.strptime(day, '%Y-%m-%d') - timedelta(days=7):%Y-%m-%d}")
+            if a is not None and b is not None:
+                pairs.append([day, a, b])
+        n = len(pairs)
+        out.write(f"\n{pname}, {n} pairs\n")
+        out.write("window               decision   up    control   up    difference  95%\n")
+        for w in range(len(windows)):
+            p2 = [x for x in pairs if x[1][w] is not None and x[2][w] is not None]
+            d = [x[1][w] for x in p2]
+            c = [x[2][w] for x in p2]
+            diff = [d[k] - c[k] for k in range(len(d))]
+            boot = []
+            for _ in range(10000):
+                pick = [random.choice(diff) for _ in diff]
+                boot.append(mean(pick))
+            boot.sort()
+            up_d = sum(1 for x in d if x > 0)
+            up_c = sum(1 for x in c if x > 0)
+            out.write(f"{windows[w][0]:20} {mean(d):+6.2f}%  {up_d:2}/{len(d):2}  {mean(c):+6.2f}%  {up_c:2}/{len(c):2}   {mean(diff):+6.2f}%  [{boot[250]:+.2f}; {boot[9750]:+.2f}]\n")
+        x = [p2[1][1] for p2 in pairs]
+        y = [p2[1][4] for p2 in pairs]
+        out.write(f"does the morning 07:00 -> 10:29 guess the move after the release (10:29 -> 11:29)? corr {corr(x, y):+.2f}, same sign {sum(1 for k in range(n) if x[k] * y[k] > 0)}/{n} (noise level about {2 / n ** 0.5:.2f})\n")
+        out.write("by year, 07:00 -> 10:29 on decision days: ")
+        for year in range(2021, 2027):
+            v = [p2[1][1] for p2 in pairs if p2[0][:4] == str(year)]
+            if len(v) > 0:
+                out.write(f"{year}: {mean(v):+.2f}% ({sum(1 for z in v if z > 0)}/{len(v)})  ")
+        out.write("\n")
+    out.close()
+
+
+def step_sectors():
+    # who reacts to the rate the most? first hour after the release (10:29 -> 11:29 UTC), since jul 2023
+    # beta = slope of the group move on the IMOEX move: 2 = the group moves 2x the index
+    # decision days vs control days (same weekday a week earlier), difference with bootstrap by dates
+    import random
+    random.seed(1)
+    changes = pandas.read_csv("data/cb_kir_decisions.csv")
+    groups = [["developers", ["SMLT", "LSRG", "ETLN", "GLRX"]],
+              ["big banks", ["SBER", "VTBR", "T"]],
+              ["mid banks", ["BSPB", "SVCB", "MBNK", "CBOM"]],
+              ["retail", ["X5", "MGNT"]],
+              ["Aeroflot", ["AFLT"]],
+              ["oil and gas", ["LKOH", "ROSN", "GAZP"]]]
+
+    def closes(day, ticker):
+        path = f"data/minutes/{day}_{ticker}.csv"
+        if not os.path.exists(path):
+            return None
+        d = pandas.read_csv(path)
+        return dict(zip(d["time"], d["close"]))
+
+    def at(c, hm):
+        t = [x for x in c if x <= hm]
+        return c[max(t)] if t else None
+
+    def hour(day, ticker):
+        c = closes(day, ticker)
+        if c is None or "10:29" not in c or at(c, "11:29") is None:
+            return None
+        return pct(c["10:29"], at(c, "11:29"))
+
+    def group_move(day, tickers):
+        v = [hour(day, t) for t in tickers]
+        v = [x for x in v if x is not None]
+        return sum(v) / len(v) if v else None
+
+    new = [d for d in changes["date"] if d >= "2023-07-01"]
+    out = open("results/sectors/raw/sectors.txt", "w")
+    out.write("first hour 10:29 -> 11:29 UTC, since jul 2023. beta = slope of the group on IMOEX, control = same weekday a week earlier\n")
+    out.write("group = average of its stocks that have a price\n\n")
+    out.write("group         days | beta decision  beta control | difference  95%\n")
+    for name, tickers in groups:
+        rows = []
+        for day in new:
+            control = f"{datetime.strptime(day, '%Y-%m-%d') - timedelta(days=7):%Y-%m-%d}"
+            a = [hour(day, "IMOEX"), group_move(day, tickers)]
+            b = [hour(control, "IMOEX"), group_move(control, tickers)]
+            if None in a or None in b:
+                continue
+            rows.append([a, b])
+        n = len(rows)
+        bd = slope([r[0][0] for r in rows], [r[0][1] for r in rows])
+        bc = slope([r[1][0] for r in rows], [r[1][1] for r in rows])
+        boot = []
+        for _ in range(10000):
+            pick = [random.choice(rows) for _ in rows]
+            boot.append(slope([r[0][0] for r in pick], [r[0][1] for r in pick]) - slope([r[1][0] for r in pick], [r[1][1] for r in pick]))
+        boot.sort()
+        out.write(f"{name:12} {n:4}  |     {bd:5.2f}         {bc:5.2f}     |   {bd - bc:+5.2f}   [{boot[250]:+.2f}; {boot[9750]:+.2f}]\n")
+
+    out.write("\nsingle stocks, decision days: beta and corr with IMOEX\n")
+    for name, tickers in groups:
+        for t in tickers:
+            x = []
+            y = []
+            for day in new:
+                a = hour(day, "IMOEX")
+                b = hour(day, t)
+                if a is not None and b is not None:
+                    x.append(a)
+                    y.append(b)
+            if len(x) >= 10:
+                out.write(f"   {name:12} {t:5} days {len(x):2}   beta {slope(x, y):5.2f}   corr {corr(x, y):+.2f}\n")
+
+    # developers minus oil and gas: the most and the least rate-sensitive groups
+    out.write("\ndevelopers minus oil and gas, first hour: does it go with the bond surprise (RGBI 10:29 -> 11:29)?\n")
+    x = []
+    y = []
+    z = []
+    for day in new:
+        dv = group_move(day, ["SMLT", "LSRG", "ETLN", "GLRX"])
+        og = group_move(day, ["LKOH", "ROSN", "GAZP"])
+        b = hour(day, "RGBI")
+        i = hour(day, "IMOEX")
+        if None in [dv, og, b, i]:
+            continue
+        x.append(dv - og)
+        y.append(b)
+        z.append(i)
+    out.write(f"   days {len(x)}: corr with RGBI {corr(x, y):+.2f}, corr with IMOEX {corr(x, z):+.2f}\n")
     out.close()
 
 

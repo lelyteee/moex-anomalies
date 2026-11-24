@@ -1,0 +1,15 @@
+since jul 2023, 27 decisions, UTC, base = close at 10:29. noise level for corr about 0.38
+
+1. first hour, IMOEX vs RGBI
+   corr +0.90, rank corr +0.74
+   bootstrap by dates 95%: [+0.50; +0.98]
+   without one date: from +0.70 (without 2024-12-20) to +0.93
+
+2. who is first
+   IMOEX first minute vs RGBI after it (10:30 -> 11:29): corr +0.70
+   RGBI first 5 minutes vs IMOEX after them (10:34 -> 11:29): corr -0.44
+   if stocks predict later bonds, RGBI is slow and partly follows stocks: it's not a clean outside measure of the surprise
+
+3. key meetings (feb, apr, jul, oct + 15 sep 2023) vs regular
+   key 15: corr +0.63   regular 12: corr +0.96   difference +0.33
+   random splits with the same or bigger difference: 29.4% of 10000

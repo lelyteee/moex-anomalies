@@ -116,6 +116,25 @@ Futures that day ([`imoexf_seconds.txt`](raw/imoexf_seconds.txt)): trading jumps
 - Even 3 p.p. cuts in 2022 did not move the market. Bonds barely moved either: the cuts were expected.
 - 15 Aug 2023 is the first strong reaction in the whole data and the start of the new period.
 
+**9. What close hides: high and low.** Every minute has a high and a low, not only a close. Raw: [`highlow_check.txt`](raw/highlow_check.txt), step `highlow_check` in `decision.py`. Since Jul 2023, decision days vs the same weekday a week earlier.
+
+Inside the minute 10:30 the price swings a lot: high − low is 12–38× an ordinary day (IMOEX 0.87% vs 0.05%, Samolet 3.9% vs 0.1%).
+
+But it doesn't overshoot. The part of the move that comes back by the end of the minute is 15–32%, about the same as for any big minute on an ordinary day (9–34%). So at 10:30 the price jumps to the new level, it doesn't fly past it and come back.
+
+Before the release it's different. Minutes in 10:25–10:29 where the price went 0.3% or more and came back inside the same minute: 17 on decision days, 0 on control days. Most of them are Samolet in random directions, it's a thin and jumpy stock. But one day stands out:
+
+| 24 Oct 2025, minute 10:29 | went | closed | 10:30 after |
+|---|---|---|---|
+| IMOEXF | +0.62% | +0.04% | +1.07% |
+| Lukoil | +0.62% | +0.02% | +0.55% |
+| IMOEX | +0.46% | +0.09% | +0.97% |
+| T | +0.46% | +0.01% | +1.04% |
+| Sberbank | +0.40% | +0.12% | +1.41% |
+| Gazprom | +0.31% | +0.03% | +0.99% |
+
+The whole market jumped up and came back within one minute right before the release, and then went up for real. By closes this minute looks flat, that's why it's not in finding 5. Same kind of thing as the dollar spike on 21 Jul 2022, only here it's right before a decision. With minute candles I can't see what happened inside, 5-second data and the live record on the next meetings should show it.
+
 ## Why the market became so sensitive
 
 Opinions from conversations, not proven:
