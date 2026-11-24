@@ -1,0 +1,16 @@
+2022-07-21: no RVI
+2022-08-19: no RVI
+2023-08-25: no RVI
+2024-01-16: no RVI
+2024-02-09: no RVI
+2025-06-09: RVI has 867 minutes, not enough around 
+2025-09-16 08:33: RVI before 34.06, max in 10 min after 34.90 (+0.84), 30 min after 33.69 (-0.37)
+2025-10-24 10:29: RVI before 39.93, max in 10 min after 40.02 (+0.09), 30 min after 40.27 (+0.34)
+
+RVI daily: 1490 days, from 2021-01-04 to 2026-11-24
+   2021: mean 27.5, min 20.3, max 38.4
+   2022: mean 60.6, min 28.7, max 142.7
+   2023: mean 29.9, min 19.3, max 47.7
+   2024: mean 28.8, min 14.2, max 67.2
+   2025: mean 38.5, min 25.4, max 68.3
+   2026: mean 31.0, min 17.4, max 53.1

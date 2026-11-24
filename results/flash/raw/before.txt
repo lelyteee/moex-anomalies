@@ -1,0 +1,11 @@
+spikes since 2023 (not at the open, not at a decision). 10 minutes before each spike vs the same clock time on other days of that month
+
+ticker          spikes | pre volume vs normal (median) | share with < half the normal volume | empty minutes: spikes / placebo
+USD000UTSTOM        6  |             1.25             |          0/  6                    |    0.0 /  0.0
+CNYRUB_TOM         11  |             1.82             |          1/ 11                    |    0.0 /  0.1
+USDRUBF            24  |             4.16             |          2/ 24                    |    0.8 /  1.7
+CNYRUBF            21  |             4.01             |          1/ 21                    |    1.4 /  2.3
+IMOEXF             27  |             5.37             |          3/ 27                    |    0.6 /  1.1
+
+all: pre volume vs normal, median 3.88, below half: 7/89, above 2x: 55/89
+by the placebo itself the median is 1 and about a quarter is below half (half of the days are below the median)
