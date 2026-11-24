@@ -25,7 +25,7 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 | [key_rate](results/key_rate/) | how IMOEX reacts to Bank of Russia decisions, minute by minute | done, updating |
 | [pre_decision](results/pre_decision/) | week and morning before the decision, bonds as a surprise measure, banks | done, updating |
 | [sectors](results/sectors/) | who reacts to the rate the most: developers 2×, oil and gas below 1 | done |
-| [flash](results/flash/) | one-minute spikes: known cases + a detector on 3.4 million minutes | in progress |
+| [flash](results/flash/) | one-minute spikes in currency and futures: about once a month, cheap, stop hunt candidates | done for currency, stocks later |
 | [after_decision](results/after_decision/) | does the move continue for days after the decision | soon |
 | [cpi_wednesday](results/cpi_wednesday/) | weekly inflation data on Wednesday evenings | soon |
 | [stocks](results/stocks/) | single stocks: pumps, dividends, strange minutes | soon |

@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 token = os.environ["T_INVEST_TOKEN"]
 
-# all steps: "download", "cases", "rvi", "history", "detect", "before"
+# all steps: "download", "cases", "rvi", "history", "detect", "before", "cost"
 steps = ["detect"]
 
 # date, time of the spike (UTC, "" = find it), main instrument, the rest to compare
@@ -350,6 +350,53 @@ def step_before():
     ratios_all.sort()
     out.write(f"\nall: pre volume vs normal, median {ratios_all[len(ratios_all) // 2]:.2f}, below half: {sum(1 for r in ratios_all if r < 0.5)}/{len(ratios_all)}, above 2x: {sum(1 for r in ratios_all if r > 2)}/{len(ratios_all)}\n")
     out.write("by the placebo itself the median is 1 and about a quarter is below half (half of the days are below the median)\n")
+    out.close()
+
+
+def step_cost():
+    # 1. cost: how much money traded in the spike minute (lot = 1000 units of currency, so volume x 1000 x price)
+    #    IMOEXF only in contracts, its contract size is different
+    # 2. shape, to tell a one-off order from a stop hunt:
+    #    ladder      = the minute before already went the same way by at least a quarter of the spike
+    #    second wave = the next minute traded at least as much as the spike minute (stops and forced closes going off)
+    #    after 10 min = price 10 minutes later vs the price before the spike (near 0 = the spike told nothing)
+    f = pandas.read_csv("results/flash/raw/spikes.csv")
+    decisions = set(pandas.read_csv("data/cb_kir_decisions.csv")["date"])
+    f = f[(f["day"] >= "2023-01-01") & ~f["open"] & ~(f["day"].isin(decisions) & (f["time"] >= "10:25") & (f["time"] <= "11:00"))].reset_index(drop=True)
+    rows = []
+    cache = {}
+    for k in range(len(f)):
+        t, day, hm = f["ticker"][k], f["day"][k], f["time"][k]
+        key = (t, day[:7])
+        if key not in cache:
+            cache[key] = pandas.read_csv(f"data/flash/history/{t}_{day[:7]}.csv")
+        d = cache[key]
+        d = d[d["day"] == day].reset_index(drop=True)
+        i = d.index[d["time"] == hm][0]
+        prev = d["close"][i - 1]
+        went = f["went"][k]
+        before = d["close"][i - 2] if i >= 2 else prev
+        pre_went = pct(before, d["high"][i - 1]) if went > 0 else pct(before, d["low"][i - 1])
+        ladder = pre_went * went > 0 and abs(pre_went) >= abs(went) / 4
+        second = i + 1 < len(d) and d["volume"][i + 1] >= d["volume"][i]
+        later = d["close"][min(i + 10, len(d) - 1)]
+        money = d["volume"][i] * 1000 * d["close"][i] / 1e9 if t != "IMOEXF" else None
+        rows.append({"ticker": t, "day": day, "time": hm, "went": round(went, 2), "contracts": d["volume"][i],
+                     "bn_rub": round(money, 2) if money is not None else None, "ladder": ladder, "second_wave": second,
+                     "after_10min": round(pct(prev, later), 2)})
+    r = pandas.DataFrame(rows)
+    r.to_csv("results/flash/raw/cost.csv", index=False)
+    out = open("results/flash/raw/cost.txt", "w")
+    out.write("spikes since 2023, not at the open, not at a decision. money = volume of the spike minute x 1000 x price, bn rubles\n\n")
+    c = r[r["bn_rub"].notna()]
+    out.write(f"currency spikes: {len(c)}, money in the spike minute: median {c['bn_rub'].median():.2f} bn rub, from {c['bn_rub'].min():.2f} to {c['bn_rub'].max():.2f}\n")
+    out.write(f"move per 1 bn rub traded (median): {(c['went'].abs() / c['bn_rub']).median():.1f}%\n")
+    out.write(f"ladder (the minute before already went that way): {int(r['ladder'].sum())} of {len(r)}\n")
+    out.write(f"second wave (next minute traded as much or more): {int(r['second_wave'].sum())} of {len(r)}\n")
+    out.write(f"ladder or second wave (stop hunt candidates): {int((r['ladder'] | r['second_wave']).sum())} of {len(r)}\n")
+    out.write(f"price 10 minutes later vs before the spike: median |move| {r['after_10min'].abs().median():.2f}%, in the direction of the spike: {int((r['after_10min'] * r['went'] > 0).sum())} of {len(r)}\n")
+    out.write("\nall, biggest first\n")
+    out.write(r.sort_values("went", key=abs, ascending=False).to_string(index=False) + "\n")
     out.close()
 
 

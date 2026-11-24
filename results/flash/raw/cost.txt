@@ -1,0 +1,100 @@
+spikes since 2023, not at the open, not at a decision. money = volume of the spike minute x 1000 x price, bn rubles
+
+currency spikes: 62, money in the spike minute: median 0.51 bn rub, from 0.00 to 13.34
+move per 1 bn rub traded (median): 2.4%
+ladder (the minute before already went that way): 17 of 89
+second wave (next minute traded as much or more): 11 of 89
+ladder or second wave (stop hunt candidates): 25 of 89
+price 10 minutes later vs before the spike: median |move| 0.19%, in the direction of the spike: 60 of 89
+
+all, biggest first
+      ticker        day  time  went  contracts  bn_rub  ladder  second_wave  after_10min
+     USDRUBF 2026-04-28 06:04 -8.26      14891    1.11   False         True        -0.17
+     USDRUBF 2023-06-30 06:28  7.24      17254    1.53    True        False        -0.02
+USD000UTSTOM 2024-01-16 14:06  5.60     148777   13.34   False        False         0.14
+     CNYRUBF 2023-11-21 07:54  4.70      17410    0.21   False         True         0.03
+     USDRUBF 2024-01-16 14:06  3.44      16268    1.46   False        False         0.09
+     USDRUBF 2024-12-16 07:09 -3.42       4976    0.51   False        False         0.01
+USD000UTSTOM 2024-02-09 11:15  2.97     128322   11.67   False        False         0.11
+     USDRUBF 2024-08-12 18:41 -2.76       4709    0.42   False         True        -0.50
+      IMOEXF 2024-01-08 07:01  2.75        467     NaN   False        False         0.29
+  CNYRUB_TOM 2024-06-20 11:04 -2.57     645833    7.61   False        False         0.09
+     CNYRUBF 2023-11-21 07:55  2.45      74886    0.92    True        False         0.02
+     USDRUBF 2023-06-30 06:27  2.39       2874    0.25   False         True         0.16
+     CNYRUBF 2026-03-20 07:12 -2.28     333601    4.09   False        False        -0.33
+     CNYRUBF 2023-10-27 16:12 -1.87       2691    0.03   False        False        -0.20
+     USDRUBF 2024-08-12 18:42 -1.85       8296    0.74    True        False        -0.32
+     USDRUBF 2024-02-09 11:15  1.75      12405    1.13   False        False         0.13
+      IMOEXF 2026-07-20 16:05  1.72      66178     NaN   False        False         0.52
+     USDRUBF 2026-04-28 06:05 -1.70      28442    2.12    True        False         0.01
+     USDRUBF 2026-05-25 13:56  1.69      21186    1.53   False        False         0.21
+     CNYRUBF 2023-06-29 17:30  1.65       1695    0.02   False        False         0.00
+      IMOEXF 2025-03-18 16:48 -1.58      18423     NaN   False        False        -0.23
+     CNYRUBF 2024-01-16 14:06  1.49      32704    0.40   False        False        -0.08
+      IMOEXF 2025-05-19 16:45  1.49      73506     NaN   False        False        -0.07
+  CNYRUB_TOM 2023-11-03 08:00 -1.45    1009938   12.77   False        False        -0.19
+      IMOEXF 2023-12-15 15:00  1.44        334     NaN   False        False         0.41
+      IMOEXF 2024-02-21 10:31 -1.39       1194     NaN   False        False         0.08
+      IMOEXF 2025-03-18 16:45 -1.32      40539     NaN   False        False        -0.41
+      IMOEXF 2024-07-11 07:48  1.24       2827     NaN   False        False        -0.29
+     CNYRUBF 2026-09-30 07:30 -1.21     654674    8.21   False        False        -0.14
+      IMOEXF 2025-04-02 20:49 -1.20       5395     NaN   False        False        -0.19
+     CNYRUBF 2023-10-11 19:22 -1.19       1568    0.02   False        False        -0.93
+     USDRUBF 2025-02-26 15:26  1.14       3821    0.34   False        False         0.21
+USD000UTSTOM 2023-03-24 07:15  1.11      26651    2.04   False        False        -0.06
+      IMOEXF 2025-04-10 07:03  1.11       5520     NaN   False        False         0.05
+     CNYRUBF 2024-06-13 08:02 -1.10      22664    0.27    True        False         1.21
+  CNYRUB_TOM 2026-02-06 07:18  1.08     539004    5.98   False         True         0.61
+      IMOEXF 2024-06-13 07:04 -1.05       1071     NaN   False         True        -0.19
+  CNYRUB_TOM 2023-07-06 12:29  1.05     184603    2.35   False        False        -0.33
+      IMOEXF 2025-03-18 17:23 -1.04      27932     NaN    True        False         1.05
+     CNYRUBF 2025-12-29 07:00  1.03      92886    1.03   False        False         0.14
+     CNYRUBF 2024-06-24 07:22 -1.02      21636    0.26   False        False        -0.68
+  CNYRUB_TOM 2024-06-19 07:11  1.02     200616    2.21    True         True         0.85
+      IMOEXF 2024-06-20 12:48  1.00        934     NaN   False        False        -0.18
+      IMOEXF 2025-05-19 16:44 -1.00      26495     NaN   False         True        -0.72
+      IMOEXF 2025-05-12 06:51  0.99      18703     NaN   False        False         0.22
+  CNYRUB_TOM 2023-10-30 06:19 -0.98     193258    2.47   False        False        -0.01
+     CNYRUBF 2023-10-09 13:27 -0.97      10694    0.15   False        False        -0.23
+      IMOEXF 2026-06-26 12:09  0.96      52202     NaN   False        False        -0.26
+  CNYRUB_TOM 2023-05-02 04:18 -0.96      33919    0.39   False        False        -0.34
+      IMOEXF 2026-06-26 11:59  0.96      48328     NaN   False        False         3.37
+  CNYRUB_TOM 2025-02-07 07:57 -0.94     169916    2.26   False        False        -0.02
+     USDRUBF 2025-10-30 18:40  0.92       4705    0.38   False        False         0.11
+      IMOEXF 2026-07-08 08:33  0.92      31519     NaN    True        False        -0.45
+      IMOEXF 2026-08-31 15:21  0.90      61227     NaN   False        False        -0.05
+     USDRUBF 2023-02-01 20:41 -0.89        448    0.03   False        False        -0.10
+     CNYRUBF 2024-06-19 07:12  0.88      46093    0.51   False        False         0.17
+      IMOEXF 2026-08-06 09:54 -0.88      55391     NaN   False        False         0.00
+     USDRUBF 2024-03-13 16:26  0.88       1283    0.12   False        False        -0.03
+      IMOEXF 2025-09-16 08:33 -0.88      61389     NaN   False        False        -0.39
+     CNYRUBF 2024-06-19 07:04 -0.87      84991    0.94    True        False        -1.05
+USD000UTSTOM 2023-12-04 11:47 -0.87      43149    3.91   False        False        -0.01
+     USDRUBF 2023-06-30 06:29  0.87       5720    0.51    True        False        -0.32
+     USDRUBF 2023-06-15 09:20 -0.87       5599    0.47   False        False        -0.01
+     USDRUBF 2025-03-25 10:09  0.87       2882    0.25   False        False        -0.03
+     CNYRUBF 2023-09-22 16:25  0.84      13361    0.18   False        False         0.15
+     CNYRUBF 2024-06-20 09:49  0.84      42424    0.50   False        False         0.71
+     CNYRUBF 2024-06-13 07:04  0.84      15151    0.19    True        False         0.06
+     USDRUBF 2023-08-15 07:31  0.83       1957    0.19   False        False         1.23
+     USDRUBF 2023-01-13 11:23  0.82       1033    0.07   False        False         0.15
+      IMOEXF 2025-11-19 18:02  0.82      30439     NaN   False        False        -0.09
+     CNYRUBF 2025-08-06 17:02 -0.81      78503    0.87   False        False        -0.36
+      IMOEXF 2025-05-16 13:36  0.80      50037     NaN   False        False        -0.19
+     CNYRUBF 2023-01-16 19:17  0.79        430    0.00   False        False         0.20
+     USDRUBF 2024-06-18 20:39 -0.78        581    0.05   False        False        -0.06
+USD000UTSTOM 2023-03-16 09:29 -0.77     106379    8.10    True        False        -0.32
+      IMOEXF 2024-12-23 08:03  0.77       8782     NaN    True        False        -0.62
+     CNYRUBF 2024-09-04 11:55 -0.76      69548    0.85   False        False         0.28
+     CNYRUBF 2023-06-29 16:17  0.75        973    0.01   False        False         0.08
+      IMOEXF 2025-10-16 17:08  0.75      41553     NaN    True         True         2.97
+     USDRUBF 2025-02-28 18:24  0.74       3062    0.28   False        False         0.06
+      IMOEXF 2024-03-22 17:46 -0.74        824     NaN   False        False        -0.25
+     USDRUBF 2025-02-17 07:07 -0.73       1838    0.17   False        False        -0.42
+     USDRUBF 2024-06-19 07:14 -0.73       1046    0.09    True        False        -1.08
+      IMOEXF 2025-03-18 17:22 -0.73      19516     NaN    True         True         0.48
+     USDRUBF 2023-08-15 07:30 -0.72       1480    0.14   False         True         0.12
+  CNYRUB_TOM 2024-06-20 09:49 -0.72     114906    1.35   False        False         0.07
+  CNYRUB_TOM 2023-08-15 07:30 -0.72     206742    2.70   False        False         0.05
+USD000UTSTOM 2023-11-03 08:00 -0.72      43350    4.02   False        False        -0.18
+  CNYRUB_TOM 2024-01-16 14:08 -0.70     224467    2.73    True        False        -0.52

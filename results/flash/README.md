@@ -68,6 +68,24 @@ I expected an empty market before the spike. It's the opposite:
 
 So spikes don't come out of a dead market. They come when the market is already busy, something is going on, and then one more big order eats the book. It looks like the 2010 Flash Crash in the US: it happened on a nervous, busy day, when liquidity ran out, not when nobody was trading. Careful though: days with spikes are probably news days, so part of the "busy" is just the news.
 
+## How much it costs, and who wins
+
+Money that traded in the spike minute (volume × 1000 × price, a lot is 1000 units of currency). Step `cost`, raw: [`cost.txt`](raw/cost.txt), [`cost.csv`](raw/cost.csv).
+
+- Median spike minute: **0.5 bn rubles**. Dollar futures −8.3% on 28 Apr 2026: 1.1 bn. The biggest, dollar spot +5.6% on 16 Jan 2024: 13 bn.
+- That's the whole minute, not one player, others trade in it too. So in a thin minute moving the dollar by a few % takes less than a billion rubles. For a big bank or a fund that's not much. The anomaly is really holes in liquidity.
+- 10 minutes later the price is about where it was before (median 0.19%). The spike tells nothing about where the price goes.
+
+Who wins and who loses: whoever hit the book with a market order sold at 68.6 instead of 74.8 (28 Apr 2026), about 6 mln rubles lost per 1 mln dollars filled like that. Whoever had limit orders deep in the book bought cheap and could sell back a minute later. Three stories fit this:
+
+1. **Fat finger.** A wrong-sized market order by mistake. No scheme, someone just lost money.
+2. **Stop hunt.** Someone pushes the price on purpose so other people's stop orders and forced closes of leveraged positions go off, and buys back at the bottom. Then the spike should come in steps.
+3. **A broken robot** on a thin market.
+
+Candles can't tell these apart, but they can show the steps. Ladder = the minute before already went the same way, second wave = the next minute traded as much or more. **25 of 89** spikes have one of the two. The four biggest futures spikes all come in two minutes: 30 Jun 2023 +2.4%, then +7.2%; 28 Apr 2026 −8.3%, then the next minute traded twice as much; 21 Nov 2023 yuan +4.7%, then +2.5% with 4× the volume; 12 Aug 2024 −2.8%, then −1.9%. Those are the best stop hunt candidates. The big spot spikes (16 Jan 2024, 9 Feb 2024) are one minute, closer to one big order.
+
+Who did it and why can't be seen in public data, only the exchange and the Bank of Russia see who sent the orders. What I can say: the anomaly is regular (about once a month), it's cheap, and the way money moves in it is clear.
+
 ## Next
 
 - Same detector on stocks, especially the illiquid ones.
