@@ -46,6 +46,8 @@ I rechecked the main results with separate code and stricter controls.
 
 How I compute things and why (bootstrap, controls, placebo etc): [`METHODS.md`](METHODS.md)
 
+Rules for new meetings, written before I see them: [`PREREG.md`](PREREG.md)
+
 ## Structure
 
 ```
