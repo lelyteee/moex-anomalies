@@ -145,3 +145,13 @@ All inside the noise (±0.38), and if anything the wrong way. In the last 5 minu
 | 08:30 → 10:29 | +0.07% | 14 of 26 | +0.01% | +0.06 [−0.24; +0.35] |
 
 The morning goes up on 20 of 26 decision days, but against its own control day the difference includes zero. And over the whole time from the previous close it's exactly the same as the control: the morning rise just makes up for a weaker night. The morning also doesn't guess where the market goes after the release (corr +0.23, same sign 11 of 26, noise ±0.39). So it's at most a weak "maybe", not an anomaly.
+
+**14. Fear before the decision.** In the US the option market expects bigger moves before a Fed decision and calms down right after. Here with RVI (the "fear index", from option prices), daily closes, change in % of the RVI level, vs all other Fridays. Raw: [`rvi.txt`](raw/rvi.txt), step `rvi`.
+
+| Since Jul 2023, 27 decisions | decision | other Fridays | difference, 95% | RVI went down |
+|---|---|---|---|---|
+| 5 sessions before | +2.98% | −0.01% | +3.00 [−1.73; +8.18] | 10 of 27 |
+| the decision day | −1.04% | −0.02% | −1.02 [−3.56; +1.62] | 18 of 27 |
+| the day after | +4.25% | +2.94% | +1.32 [−1.95; +5.04] | 4 of 27 |
+
+The shape is the US one: fear goes up in the days before, down on the day itself in 18 of 27 meetings. But every interval includes zero, and before Jul 2023 it was the other way (−3.9% in the 5 sessions before). The day after is a Monday, and RVI goes up on Mondays anyway. So the option market barely prices the meeting in advance.

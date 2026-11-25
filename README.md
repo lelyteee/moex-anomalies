@@ -22,20 +22,14 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 
 | Topic | What | Status |
 |---|---|---|
-| [key_rate](results/key_rate/) | how IMOEX reacts to Bank of Russia decisions, minute by minute | done, updating |
-| [pre_decision](results/pre_decision/) | week and morning before the decision, bonds as a surprise measure, banks | done, updating |
+| [key_rate](results/key_rate/) | how IMOEX reacts to Bank of Russia decisions, minute by minute | done |
+| [pre_decision](results/pre_decision/) | week and morning before the decision, bonds as a surprise measure, banks | done |
 | [sectors](results/sectors/) | who reacts to the rate the most: developers 2×, oil and gas below 1 | done |
-| [flash](results/flash/) | one-minute spikes in currency and futures: about once a month, cheap, stop hunt candidates | done for currency, stocks later |
+| [flash](results/flash/) | one-minute spikes in currency and futures: about once a month, cheap, stop hunt candidates | done (currency and futures) |
+| [currency](results/currency/) | ruble around the key rate, the tax week and the Minfin announcement | done |
 | [after_decision](results/after_decision/) | does the move continue for days after the decision | soon |
 | [cpi_wednesday](results/cpi_wednesday/) | weekly inflation data on Wednesday evenings | soon |
 | [stocks](results/stocks/) | single stocks: pumps, dividends, strange minutes | soon |
-
-Also coming:
-
-- **Currency.** Dollar, yuan and gold on decision days react much weaker than stocks. I thought the link to the surprise disappeared after 2023, but before 2023 there are only 6–11 days and one day flips the result, so I can't say that.
-- **One-minute spikes.** On 21 Jul 2022 at 10:12 Moscow the dollar, yuan and both currency futures jumped 3.5–4% in one minute and mostly came back in the next one, stocks dipped at the same time. I found no news for that minute. Such spikes happen on MOEX every now and then, I want to find all of them and see what comes before.
-- **High and low around 10:30.** What happens inside the first minutes, not only the close.
-- **Every new decision.** I collect minute and 5-second data for each meeting, next one is 18 Dec 2026.
 
 ## What holds so far
 
@@ -61,6 +55,7 @@ scripts/decision.py           around the decision: daily data, extraordinary mee
 scripts/collect.py            raw 5-second candles for the last ~30 days (T-Invest doesn't keep more)
 scripts/record_live.py        live record of every trade (buy or sell) and the order book, for decision days
 scripts/flash.py              one-minute spikes: known cases, minute history, detector (pick steps at the top)
+scripts/currency.py           ruble: decision days, tax week, Minfin announcement (reads data/flash/history)
 data/instruments.csv          all instruments: ticker, name, kind, uid
 data/cb_kir_decisions.csv     decision dates, rate before / after
 data/imoex_daily.csv          IMOEX daily candles since 2021
@@ -69,6 +64,7 @@ results/key_rate/             reaction to the decision
 results/pre_decision/         week before, bonds, banks, press conference
 results/sectors/              which sectors react to the rate
 results/flash/                one-minute spikes
+results/currency/             ruble around scheduled events
 results/after_decision/       days after the decision (soon)
 results/cpi_wednesday/        weekly inflation on Wednesdays (soon)
 results/stocks/               single stocks (soon)

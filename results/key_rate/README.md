@@ -48,6 +48,8 @@ But I shouldn't compare with zero, ordinary days also move. Same minutes on the 
 
 So "15× bigger" is true only for the first minute. Over the hour the reaction grew about 2.5× (0.34% → 0.85%), to the close about 3× (0.51% → 1.57%). The 95% intervals (bootstrap by dates, see [METHODS](../../METHODS.md)) are in the raw file, since Jul 2023 none of them gets close to 1.
 
+Maybe the whole market just got more nervous? RVI says no. RVI is the "fear index" (like VIX in the US): from option prices, how big a move the market expects. The day before a decision it was 37.5 on average before Jul 2023 and 32.1 after, so the market got calmer. And in its own units the reaction still grew: the first hour after the release is 15% of an expected day's move before Jul 2023 and 41% after (control days 8% and 10%). Raw: [`rvi.txt`](../pre_decision/raw/rvi.txt), step `rvi`.
+
 The new period starts with the emergency decision of 15 Aug 2023 (8.5% → 12%, after the ruble fell below 100 per dollar). See finding 8.
 
 **3. The move happens in the first minute and holds.** In all 18 regular meetings with a move of 0.5% or more in the first 5 minutes, the market was still on the same side an hour later. The only clear U-turn is 15 Aug 2023.
@@ -63,7 +65,7 @@ And it gets faster every year. Share = (1 min move) / (1 hour move), median over
 | 2025 | 8 | 0.92 | 6/8 |
 | 2026 | 7 | 0.87 | 7/7 |
 
-In 2021 the first minute said nothing about the hour. In 2026 it's almost the whole hour and the direction matched 7 of 7. My guess is algos that read the release and trade within seconds, but minute candles can't show that. 5-second data from the next decisions should.
+In 2021 the first minute said nothing about the hour. In 2026 it's almost the whole hour and the direction matched 7 of 7. My guess is algos that read the release and trade within seconds, but minute candles can't show that.
 
 **4. Expectations matter more than the decision.**
 
@@ -133,7 +135,7 @@ Before the release it's different. Minutes in 10:25–10:29 where the price went
 | Sberbank | +0.40% | +0.12% | +1.41% |
 | Gazprom | +0.31% | +0.03% | +0.99% |
 
-The whole market jumped up and came back within one minute right before the release, and then went up for real. By closes this minute looks flat, that's why it's not in finding 5. Same kind of thing as the dollar spike on 21 Jul 2022, only here it's right before a decision. With minute candles I can't see what happened inside, 5-second data and the live record on the next meetings should show it.
+The whole market jumped up and came back within one minute right before the release, and then went up for real. By closes this minute looks flat, that's why it's not in finding 5. Same kind of thing as the dollar spike on 21 Jul 2022, only here it's right before a decision. With minute candles I can't see what happened inside.
 
 ## Why the market became so sensitive
 
@@ -153,17 +155,10 @@ What the data says:
 | 10–17% | 17 | 0.61% |
 | 17% and above | 11 | 0.85% |
 
-A higher rate goes with bigger reactions, but the rate was below 10% only before Aug 2023, so this mixes with time. In spring 2022 the rate was high (17% and 11%) and the reaction was tiny: bonds barely moved, those decisions were expected. Bonds give the answer: since 2023 surprises are about 4× bigger and stocks about 3× more sensitive ([pre_decision](../pre_decision/)).
+A higher rate goes with bigger reactions, but the rate was below 10% only before Aug 2023, so this mixes with time. In spring 2022 the rate was high (17% and 11%) and the reaction was tiny: bonds barely moved, those decisions were expected. Bonds hint that both the surprises and the sensitivity grew, but RGBI partly follows stocks, so I can't split it reliably ([pre_decision](../pre_decision/), findings 2 and 3).
 
 Still open: the first explanation says *why* the market reacts, but not *why exactly from 2023*. And expectations build up over days, so a 1% move in the minute before the announcement still needs a reason.
 
-## Ideas
+## Similar research
 
-Own thoughts, not checked.
-
-- **News first.** Any strange move must be checked against news before calling it an anomaly.
-- **Single stocks, not the index.** Pumps and insider trading are said to be common on the Russian market, mostly in small stocks where little money moves the price. The index averages this away. See [stocks](../stocks/).
-- **Jump and fall back.** A sharp move that quickly reverses can be a manipulation, someone hunting stop orders, or just a lack of buyers. A simple detector: a jump of more than X% in a minute, then more than half of it back within N minutes.
-- **Insider footprint.** Someone with inside information may buy a lot of a stock nobody usually trades, often with borrowed money. We cannot see who traded, only the footprint: volume many times above normal, then news, then a price move the same way. Also count how often such a spike is *not* followed by news.
-- **Known cases.** The Bank of Russia publishes cases of proven manipulation and insider trading. They could be used to test a detector.
-- **Similar research.** Bernile, Hu, Tang (2016) found informed trading in S&P 500 futures in the minutes before US Federal Reserve announcements — the closest analogue to the moves before 10:30 here.
+Bernile, Hu, Tang (2016) found informed trading in S&P 500 futures in the minutes before US Federal Reserve announcements, the closest analogue to the moves before 10:30 here. Lucca and Moench (2015): US stocks rise in the day before Fed decisions, here it's not the case ([pre_decision](../pre_decision/), finding 13).

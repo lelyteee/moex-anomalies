@@ -85,8 +85,3 @@ Who wins and who loses: whoever hit the book with a market order sold at 68.6 in
 Candles can't tell these apart, but they can show the steps. Ladder = the minute before already went the same way, second wave = the next minute traded as much or more. **25 of 89** spikes have one of the two. The four biggest futures spikes all come in two minutes: 30 Jun 2023 +2.4%, then +7.2%; 28 Apr 2026 −8.3%, then the next minute traded twice as much; 21 Nov 2023 yuan +4.7%, then +2.5% with 4× the volume; 12 Aug 2024 −2.8%, then −1.9%. Those are the best stop hunt candidates. The big spot spikes (16 Jan 2024, 9 Feb 2024) are one minute, closer to one big order.
 
 Who did it and why can't be seen in public data, only the exchange and the Bank of Russia see who sent the orders. What I can say: the anomaly is regular (about once a month), it's cheap, and the way money moves in it is clear.
-
-## Next
-
-- Same detector on stocks, especially the illiquid ones.
-- 5-second data: `collect.py` now saves currency too, so the next spike within a month can be seen at 5 seconds.
