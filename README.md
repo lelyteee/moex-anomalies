@@ -27,9 +27,6 @@ Build a pipeline that detects unusual trading activity on MOEX and study what fo
 | [sectors](results/sectors/) | who reacts to the rate the most: developers 2×, oil and gas below 1 | done |
 | [flash](results/flash/) | one-minute spikes in currency and futures: about once a month, cheap, stop hunt candidates | done (currency and futures) |
 | [currency](results/currency/) | ruble around the key rate, the tax week and the Minfin announcement | done |
-| [after_decision](results/after_decision/) | does the move continue for days after the decision | soon |
-| [cpi_wednesday](results/cpi_wednesday/) | weekly inflation data on Wednesday evenings | soon |
-| [stocks](results/stocks/) | single stocks: pumps, dividends, strange minutes | soon |
 
 ## What holds so far
 
